@@ -64,7 +64,7 @@ namespace VCZ1_TOOL
         private void Btn_Pair_Click(object sender, EventArgs e)
         {
             //--- GetScanned Devices
-            Z1_SCAN_ALL();
+            // Z1_SCAN_ALL();
             Z1_LIST_DEVICES();
 
             //--- Get SN 
@@ -78,9 +78,6 @@ namespace VCZ1_TOOL
                 }
                 else
                     gOp.SN[i] = "";
-
-                if (gOp.SN[i].Length >= 4)
-                    gOp.numSN++;
             }
             //--- Start Measure
             Start_Measure();
@@ -95,6 +92,8 @@ namespace VCZ1_TOOL
 
         private void Btn_Stop_Click(object sender, EventArgs e)
         {
+            listDebug.Items.Insert(0, "--- Stop Started");
+
             Stop_Measure();
             SetCurrentInputPostion();
         }
@@ -160,6 +159,8 @@ namespace VCZ1_TOOL
                 gCfg.duration = int.Parse(textBox3.Text.ToString());
                 //--- set focus to BARCODE
                 SetCurrentInputPostion();
+
+                Write_Configuration();
             }
             else
             {

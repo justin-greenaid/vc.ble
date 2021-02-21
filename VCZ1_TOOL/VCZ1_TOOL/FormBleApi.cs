@@ -31,7 +31,7 @@ namespace VCZ1_TOOL
             string parameters = "VC Z1 " + serial_number.Substring(serial_number.Length - 4);
             var result =ble[index].StartScan(parameters, (d) => listDebug.Items.Insert(0, d));
 
-            listDebug.Items.Insert(0, "[After Scan:" +gOp.SN[gOp.curIndex] +"]" + result.ToString());
+            listDebug.Items.Insert(0, "[After Scan:" +gOp.SN[index] +"]" + result.ToString());
             if (result.Equals(ERROR_CODE.BLE_FOUND_DEVICE))
             {
                 var error_code = await ble[index].OpenDevice(parameters);
@@ -61,6 +61,7 @@ namespace VCZ1_TOOL
 
         private void Z1_LIST_DEVICES()
         {
+#if _SCAN_FIRST
             string s1, s2;
             int i, j, k;
 
@@ -93,8 +94,19 @@ namespace VCZ1_TOOL
                     }
                 }
             }
+#else
+            int i;
+
+            for (i = 0; i < MAX_NUM_SN; i++)
+            {
+                gOp.ValidDevice[i] = 0;
+                if (gOp.SN[i].Length < 4)
+                    continue;
+                gOp.ValidDevice[i] = 1;
+            }
+#endif
         }
-        
+   
         private bool Z1_Is_SN_Valid(int ix)
         {
             if (gOp.ValidDevice[ix] == 1)
@@ -103,46 +115,63 @@ namespace VCZ1_TOOL
             return false;
         }
 
-        private void Z1_SET_CONFIG()
+        public ERROR_CODE Z1_GetDeviceConnectionStatus(int index, string device_name)
         {
-
+            var result = ERROR_CODE.NONE;
+            result = ble[index].ConnnectionStatus(device_name);
+            return result;
         }
 
-        private async Task<int> Z1_GET_DATA(double[] values)
+        private async Task<int> Z1_GET_DATA(int index, double[] values)
         {
             //--- check if SN is connected
-            if (Z1_IsConnected(gOp.SN[gOp.curIndex]) == false)
+            if (Z1_GetDeviceConnectionStatus(index, "VC Z1 " + gOp.SN[index].Substring(gOp.SN[index].Length - 4)) == ERROR_CODE.BLE_NO_CONNECTED)
             {
-                
+                Task<int> ret = Z1_PAIR_SN(index, gOp.SN[index]);
+                int result = await ret;
+                if (result > 0)
+                {
+                    listDebug.Items.Insert(0, index.ToString() + " @@@ Reconnected");
+                    Set_Connection_Status(index, true);
+                }
+                else
+                {
+                    listDebug.Items.Insert(0, index.ToString() + " ### Connection Error");
+                    read_complete = -2;
+                    Set_Connection_Status(index, false);
+                }
+                Set_Connection_Status(index, false);
+                return read_complete;
             }
 
             string[] srVals = { "0", "0", "0" };
             string srData;
 
-            if (gOp.curIndex < 0 || gOp.curIndex >= MAX_NUM_SN)
+            if (index < 0 || index >= MAX_NUM_SN)
                 return -1;
 
+            read_complete = 1;
             // 온도
             string characteristic_name = "EnvironmentalSensing/Temperature";
-            string dev_name = "VC Z1 " + gOp.SN[gOp.curIndex].Substring(gOp.SN[gOp.curIndex].Length - 4);
+            string dev_name = "VC Z1 " + gOp.SN[index].Substring(gOp.SN[index].Length - 4);
 
             //listDebug.Items.Insert(0, $"set {characteristic_name}");
-            var error_code = await ble[gOp.curIndex].ReadCharacteristic(dev_name, characteristic_name);
+            ERROR_CODE error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
             if (error_code == ERROR_CODE.NONE)
             {
                 //listDebug.Items.Insert(0, $"{characteristic_name}: {ble.getCharacteristic()}");
-                srData = ble[gOp.curIndex].getCharacteristic();
+                srData = ble[index].getCharacteristic();
                 srVals = srData.Split(' ');
                 values[0] = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
                 values[0] = values[0] / 100.0;
-                listDebug.Items.Insert(0, gOp.SN[gOp.curIndex] + "(온도):" + ble[gOp.curIndex].getCharacteristic() + "==>" + values[0].ToString());
+                listDebug.Items.Insert(0, gOp.SN[index] + "(온도):" + ble[index].getCharacteristic() + "==>" + values[0].ToString());
 
                 //values[0] = double.Parse(ble.getCharacteristic());
             } else
             {
-                Task<int> ret = Z1_PAIR_SN(gOp.curIndex, gOp.SN[gOp.curIndex]);
+                Task<int> ret = Z1_PAIR_SN(index, gOp.SN[index]);
                 int result = await ret;
-                listDebug.Items.Insert(0, "ERROR: TEMP");
+                listDebug.Items.Insert(0, index.ToString() + " ### ERROR: TEMP");
                 read_complete = -2;
                 return read_complete;
             }
@@ -150,107 +179,99 @@ namespace VCZ1_TOOL
             // 습도
             characteristic_name = "EnvironmentalSensing/Humidity";
             //listDebug.Items.Insert(0, $"set {characteristic_name}");
-            error_code = await ble[gOp.curIndex].ReadCharacteristic(dev_name, characteristic_name);
+            error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
             if (error_code == ERROR_CODE.NONE)
             {
                 //listDebug.Items.Insert(0, $"{characteristic_name}: {ble.getCharacteristic()}");
-                srData = ble[gOp.curIndex].getCharacteristic();
+                srData = ble[index].getCharacteristic();
                 srVals = srData.Split(' ');
                 values[1] = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
                 values[1] = values[1] / 100.0;
-                listDebug.Items.Insert(0, gOp.SN[gOp.curIndex] + "(습도):" + ble[gOp.curIndex].getCharacteristic() + "==>" + values[1].ToString());
+                listDebug.Items.Insert(0, gOp.SN[index] + "(습도):" + ble[index].getCharacteristic() + "==>" + values[1].ToString());
 
-                Set_Connection_Status(true);
+                Set_Connection_Status(index, true);
             }
             else
             {
-                Task<int> ret = Z1_PAIR_SN(gOp.curIndex, gOp.SN[gOp.curIndex]);
+                Task<int> ret = Z1_PAIR_SN(index, gOp.SN[index]);
                 int result = await ret;
-                listDebug.Items.Insert(0, "ERROR: HUMI");
+                listDebug.Items.Insert(0, index.ToString() + " ### ERROR: HUMI");
                 read_complete = -2;
-                Set_Connection_Status(false);
+                Set_Connection_Status(index, false);
                 return read_complete;
             }
 
             // TVOC
             characteristic_name = "EnvironmentalSensing/TVOC";
             //listDebug.Items.Insert(0, $"set {characteristic_name}");
-            error_code = await ble[gOp.curIndex].ReadCharacteristic(dev_name, characteristic_name);
+            error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
             if (error_code == ERROR_CODE.NONE)
             {
                 //listDebug.Items.Insert(0, $"{characteristic_name}: {ble.getCharacteristic()}");
-                srData = ble[gOp.curIndex].getCharacteristic();
+                srData = ble[index].getCharacteristic();
                 srVals = srData.Split(' ');
                 values[2] = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
                 values[2] = values[2] / 100.0;
-                listDebug.Items.Insert(0, gOp.SN[gOp.curIndex] + "(TVOC):" + ble[gOp.curIndex].getCharacteristic() + "==>" + values[2].ToString());
-                Set_Connection_Status(true);
+                listDebug.Items.Insert(0, gOp.SN[index] + "(TVOC):" + ble[index].getCharacteristic() + "==>" + values[2].ToString());
+                Set_Connection_Status(index, true);
             }
             else
             {
-                Task<int> ret = Z1_PAIR_SN(gOp.curIndex, gOp.SN[gOp.curIndex]);
+                Task<int> ret = Z1_PAIR_SN(index, gOp.SN[index]);
                 int result = await ret;
-                listDebug.Items.Insert(0, "ERROR: TVOC");
+                listDebug.Items.Insert(0, index.ToString() + " ### ERROR: TVOC");
                 read_complete = -2;
-                Set_Connection_Status(false);
+                Set_Connection_Status(index, false);
                 return read_complete;
             }
 
             // FANSPEED
             characteristic_name = "VCService/FanSpeed";
             //listDebug.Items.Insert(0, $"set {characteristic_name}");
-            error_code = await ble[gOp.curIndex].ReadCharacteristic(dev_name, characteristic_name);
+            error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
             if (error_code == ERROR_CODE.NONE)
             {
                 //listDebug.Items.Insert(0, $"{characteristic_name}: {ble.getCharacteristic()}");
-                srData = ble[gOp.curIndex].getCharacteristic();
+                srData = ble[index].getCharacteristic();
                 srVals = srData.Split(' ');
                 values[3] = int.Parse(srVals[0]);
-                listDebug.Items.Insert(0, gOp.SN[gOp.curIndex] + "(FANS):" + ble[gOp.curIndex].getCharacteristic() + "==>" + values[3].ToString());
-                Set_Connection_Status(true);
+                listDebug.Items.Insert(0, gOp.SN[index] + "(FANS):" + ble[index].getCharacteristic() + "==>" + values[3].ToString());
+                Set_Connection_Status(index, true);
             }
             else
             {
-                Task<int> ret = Z1_PAIR_SN(gOp.curIndex, gOp.SN[gOp.curIndex]);
+                Task<int> ret = Z1_PAIR_SN(index, gOp.SN[index]);
                 int result = await ret;
-                listDebug.Items.Insert(0, "ERROR: FANS");
+                listDebug.Items.Insert(0, index.ToString() + " ### ERROR: FANS");
                 read_complete = -2;
-                Set_Connection_Status(false);
+                Set_Connection_Status(index, false);
                 return read_complete;
             }
 
             // BATTERY
             characteristic_name = "Battery/BatteryLevel";
             //listDebug.Items.Insert(0, $"set {characteristic_name}");
-            error_code = await ble[gOp.curIndex].ReadCharacteristic(dev_name, characteristic_name);
+            error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
             if (error_code == ERROR_CODE.NONE)
             {
                 //listDebug.Items.Insert(0, $"{characteristic_name}: {ble.getCharacteristic()}");
-                srData = ble[gOp.curIndex].getCharacteristic();
+                srData = ble[index].getCharacteristic();
                 srVals = srData.Split(' ');
                 values[4] = int.Parse(srVals[0]);
-                listDebug.Items.Insert(0, gOp.SN[gOp.curIndex] + "(BATT):" + ble[gOp.curIndex].getCharacteristic() + "==>" + values[4].ToString());
-                Set_Connection_Status(true);
+                listDebug.Items.Insert(0, gOp.SN[index] + "(BATT):" + ble[index].getCharacteristic() + "==>" + values[4].ToString());
+                Set_Connection_Status(index, true);
             }
             else
             {
-                Task<int> ret = Z1_PAIR_SN(gOp.curIndex, gOp.SN[gOp.curIndex]);
+                Task<int> ret = Z1_PAIR_SN(index, gOp.SN[index]);
                 int result = await ret;
-                listDebug.Items.Insert(0, "ERROR: BATT");
+                listDebug.Items.Insert(0, index.ToString() + " ### ERROR: BATT");
                 read_complete = -2;
-                Set_Connection_Status(false);
+                Set_Connection_Status(index, false);
                 return read_complete;
             }
 
-            Random _random = new Random();
-            /*
-            values[0] = _random.Next(1000)/10.0; // 온도
-            values[1] = _random.Next(1000)/10.0; // 습도
-            values[2] = _random.Next(100); // TVOC
-            values[3] = _random.Next(5000)/10.0; // fan speed
-            values[4] = _random.Next(1000)/10.0; // battery
-            */
-            read_complete = 10;
+            listDebug.Items.Insert(0, index.ToString() + " : Z1_GET_DATA_All data read");
             return read_complete;
         }
     }

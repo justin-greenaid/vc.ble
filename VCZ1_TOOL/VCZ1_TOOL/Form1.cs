@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace VCZ1_TOOL
 {
@@ -25,6 +27,7 @@ namespace VCZ1_TOOL
             public int duration;
             public int read_freq;
             public int log_method;  // 0: avg, 1:all
+            public int numMaxDevice;
             public string log_dir;
         }
 
@@ -37,6 +40,7 @@ namespace VCZ1_TOOL
             public int curIndex;
             public int[] numRead;
             public int[] ValidDevice;               // 0: not exist, 1:exist in scanned device
+            public int[] id;                        // unique id. normally index of List
             public DateTimeOffset startTime;        // Measure start time
             public DateTimeOffset curStartTime;     // Current SN start time
             public long elpased;
@@ -89,6 +93,7 @@ namespace VCZ1_TOOL
             }
         }
 
+        Thread[] gThread = new Thread[MAX_NUM_SN];
         Z1_Config gCfg;
         Z1_Operation gOp;
         Z1_MeasureStat[,] gMeasure = new Z1_MeasureStat[MAX_NUM_SN, 5];  // temp, humi, tvoc, fans, battery      
@@ -167,7 +172,7 @@ namespace VCZ1_TOOL
 
             //--- Getting Data
             read_complete = 0;
-            Task<int> ret = Z1_GET_DATA(z1_values);
+            Task<int> ret = Z1_GET_DATA(gOp.curIndex, z1_values);
             try
             {
                 iresult = await ret;

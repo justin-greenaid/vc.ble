@@ -18,7 +18,7 @@
                 components.Dispose();
             }
             base.Dispose(disposing);
-        }
+       }
 
         #region Windows Form 디자이너에서 생성한 코드
 
@@ -505,7 +505,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1290, 655);
+            this.ClientSize = new System.Drawing.Size(1290, 656);
             this.Controls.Add(this.Btn_ListDevice);
             this.Controls.Add(this.Btn_ScanAll);
             this.Controls.Add(this.LWARNING);

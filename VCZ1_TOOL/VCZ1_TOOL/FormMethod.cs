@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Collections.ObjectModel;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace VCZ1_TOOL
 {
@@ -54,21 +56,33 @@ namespace VCZ1_TOOL
                 gCfg.duration = int.Parse(inif.Read("Configuration", "duration"));
                 gCfg.read_freq = int.Parse(inif.Read("Configuration", "read_freq"));
                 gCfg.log_method = int.Parse(inif.Read("Configuration", "log_method"));
+                gCfg.numMaxDevice = int.Parse(inif.Read("Configuration", "num_max_devices"));
                 gCfg.log_dir = inif.Read("Configuration", "log_dir");
             }
             else
             {
-               for (i = 0; i < 3; i++)
+                // 100, 150, 50
+                double value = 100;
+                for (i = 0; i < 3; i++)
                 {
-                    gCfg.temp[i] = 100;
-                    gCfg.humi[i] = 100;
-                    gCfg.tvoc[i] = 100;
-                    gCfg.fans[i] = 100;
+                    if (i == 1)
+                        value = 150;
+                    else if (i == 2)
+                        value = 50;
+                    else
+                        value = 100;
+
+                    gCfg.temp[i] = value;
+                    gCfg.humi[i] = value;
+                    gCfg.tvoc[i] = value;
+                    gCfg.fans[i] = value;
                 }
 
                 gCfg.duration = 5;
                 gCfg.read_freq = 3;
                 gCfg.log_method = 0;
+                gCfg.numMaxDevice = 50;
+
                 gCfg.log_dir = "c:\\temp";
             }
         }
@@ -100,6 +114,9 @@ namespace VCZ1_TOOL
             strData = string.Format("{0}", gCfg.log_method);
             inif.Write("Configuration", "log_method", strData);
 
+            strData = string.Format("{0}", gCfg.numMaxDevice);
+            inif.Write("Configuration", "num_max_devices", strData);
+
             inif.Write("Configuration", "log_dir", gCfg.log_dir);
         }
 
@@ -110,6 +127,7 @@ namespace VCZ1_TOOL
             gOp.ScannedSN = new List<string>();
             gOp.ValidDevice = new int[MAX_NUM_SN];
             gOp.numRead = new int[MAX_NUM_SN];
+            gOp.id = new int[MAX_NUM_SN];
             gOp.Clear();
             gOp.ResetSN();
             gOp.mode = 1;   // measuring
@@ -213,13 +231,6 @@ namespace VCZ1_TOOL
 
         }
 
-        private int Find_Index(string serial_number)
-        {
-            int ix = -1;
-
-            return ix;
-        }
-
         private async void Start_Measure()
         {
             //--- initialize operation variables
@@ -232,15 +243,6 @@ namespace VCZ1_TOOL
                 for (int k = 0; k < 5; k++)
                     gMeasure[i, k].Reset();
 
-            //--- Start Measuring
-            gOp.curIndex = Get_Next_SN(gOp.curIndex);
-            if (gOp.curIndex < 0)
-            {
-                Warning_Message("No Devices");
-                Stop_Measure();
-                return;
-            }
-
             //--- connect 
             //Task<int> ret = Z1_PAIR_SN(gOp.curIndex, gOp.SN[gOp.curIndex]);
             //int result = await ret;
@@ -252,17 +254,48 @@ namespace VCZ1_TOOL
 
             for (int i=0; i < MAX_NUM_SN; i++)
             {
-                if (gOp.SN[i].Length > 0)
+                gOp.id[i] = i;
+                if (gOp.SN[i].Length >= 4)
                 {
                     string strfile = string.Format("{0}\\{1}_{2}.csv", gCfg.log_dir, gOp.SN[i], gOp.strLogDate);
                     System.IO.File.WriteAllText(strfile, "DateTime, SN, 온도, 습도, TVOC, FAN속도, 배터리, 결과\r\n", Encoding.Default);
+                    gOp.numSN++;
                 }
             }
+
+#if _USE_TIMER
+            //--- Start Measuring
+            gOp.curIndex = Get_Next_SN(gOp.curIndex);
+            if (gOp.curIndex < 0)
+            {
+                Warning_Message("No Devices");
+                Stop_Measure();
+                return;
+            }
+
             //--- Enable Timers
             timerPolling.Interval = gCfg.read_freq; // * 1000;
             timerPolling.Enabled = true;
             timer500.Enabled = true;
-
+#else
+            if (gOp.numSN == 0)
+            {
+                Warning_Message("No Devices");
+                Stop_Measure();
+                return;
+            }
+            int ix = 0;
+            for (int i = 0; i < MAX_NUM_SN; i++)
+            {
+                if (gOp.SN[i].Length >= 4)
+                {
+                    ix = i;
+                    gThread[ix] = new Thread(() => DataReading(gOp.id[ix], this));
+                    gThread[ix].Start();
+                    Thread.Sleep(20);
+                }
+            }
+#endif
         }
 
         private void Stop_Measure()
@@ -272,10 +305,286 @@ namespace VCZ1_TOOL
             timer500.Enabled = false;
 
             Button_Enable(gOp.mode);
+            for (int i = 0; i < MAX_NUM_SN; i++)
+            {
+                if (gOp.ValidDevice[i] == 1)
+                {
+                    gOp.ValidDevice[i] = 0;
+                    gThread[i].Join();
+                }
+            }
         }
 
-        private void Write_Measure_Result()
+        public async void DataReading(int index, FormZ1 myclass)
         {
+            FormZ1 pMain = (FormZ1)myclass;
+            double[] values = new double[5];
+
+            while (pMain.gOp.ValidDevice[index] == 1)
+            {
+                Thread.Sleep(1000);
+
+                ERROR_CODE result = ERROR_CODE.NONE;
+                listDebug.Items.Insert(0, "=================== Start " + index.ToString() + "-th Device");
+
+                //--- check if SN is connected
+                string device_name = "VC Z1 " + pMain.gOp.SN[index].Substring(pMain.gOp.SN[index].Length - 4);
+                if (pMain.Z1_GetDeviceConnectionStatus(index, device_name) == ERROR_CODE.BLE_NO_CONNECTED)
+                {
+                    result = await pMain.BleConnect(index, device_name);
+                    if ((result != ERROR_CODE.NONE))
+                    {
+                        pMain.Set_Connection_Status(index, false);
+                        continue;
+                    }
+                    pMain.Set_Connection_Status(index, true);
+                }
+
+                try
+                {
+                    // 온도
+                    string characteristic_name = "EnvironmentalSensing/Temperature";
+                    string dev_name = "VC Z1 " + gOp.SN[index].Substring(gOp.SN[index].Length - 4);
+                    string[] srVals = { "0", "0", "0" };
+                    string srData;
+
+                    ERROR_CODE error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
+                    if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                    {
+                        continue;
+                    }
+
+                    srData = ble[index].getCharacteristic();
+                    srVals = srData.Split(' ');
+                    values[0] = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    values[0] = values[0] / 100.0;
+                    listDebug.Items.Insert(0, gOp.SN[index] + "(온도):" + ble[index].getCharacteristic() + "==>" + values[0].ToString());
+
+                    // 습도
+                    characteristic_name = "EnvironmentalSensing/Humidity";
+                    error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
+                    if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                    {
+                        continue;
+                    }
+
+                    srData = ble[index].getCharacteristic();
+                    srVals = srData.Split(' ');
+                    values[1] = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    values[1] = values[1] / 100.0;
+                    listDebug.Items.Insert(0, gOp.SN[index] + "(습도):" + ble[index].getCharacteristic() + "==>" + values[1].ToString());
+
+                    // TVOC
+                    characteristic_name = "EnvironmentalSensing/TVOC";
+                    error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
+                    if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                    {
+                        continue;
+                    }
+
+                    srData = ble[index].getCharacteristic();
+                    srVals = srData.Split(' ');
+                    values[2] = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    values[2] = values[2] / 100.0;
+                    listDebug.Items.Insert(0, gOp.SN[index] + "(TVOC):" + ble[index].getCharacteristic() + "==>" + values[2].ToString());
+
+                    // FANSPEED
+                    characteristic_name = "VCService/FanSpeed";
+                    error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
+                    if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                    {
+                        continue;
+                    }
+                    srData = ble[index].getCharacteristic();
+                    srVals = srData.Split(' ');
+                    values[3] = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    values[3] = values[3] / 100.0;
+                    listDebug.Items.Insert(0, gOp.SN[index] + "(FANS):" + ble[index].getCharacteristic() + "==>" + values[3].ToString());
+
+                    // BATTERY
+                    characteristic_name = "Battery/BatteryLevel";
+                    error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
+                    if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                    {
+                        continue;
+                    }
+                    srData = ble[index].getCharacteristic();
+                    srVals = srData.Split(' ');
+                    values[4] = int.Parse(srVals[0]);
+                    listDebug.Items.Insert(0, gOp.SN[index] + "(BATT):" + ble[index].getCharacteristic() + "==>" + values[4].ToString());
+                } catch (Exception error)
+                {
+                    Warning_Message("Read Exception Occurred!");
+                    listDebug.Items.Insert(0, gOp.SN[index] + "ERROR OCCURRED");
+                    continue;
+                }
+
+                //--- All Data Read
+                Post_Processing_Result(index, values);
+                Set_Connection_Status(index, true);
+            }
+
+            pMain.listDebug.Items.Insert(0, ">>>>>>>>>>>>>>>>>>>>>> Ended " + index.ToString() + "-th Device");
+            pMain.Write_AverageMinMax(index);
+            pMain.listDebug.Items.Insert(0, ">>>>>>>>>>>>>>>>>>>>>> Writed average " + index.ToString() + "-th Device");
+        }
+
+        private void Post_Processing_Result(int index, double [] values)
+        {
+            DateTimeOffset dateNow = DateTime.Now;
+            gOp.elpased = (dateNow.Ticks - gOp.curStartTime.Ticks) / 10000000;
+
+            if (gOp.elpased >= gCfg.duration * 60)
+            {
+                // All Done
+                Stop_Measure();
+                return;
+            }
+            gOp.numRead[index]++;
+
+            //--- Averaging
+            for (int k = 0; k < 5; k++)
+            {
+                gMeasure[index, k].sum += values[k];
+                gMeasure[index, k].avg = gMeasure[index, k].sum / gOp.numRead[index];
+                if (values[k] < gMeasure[index, k].min)
+                    gMeasure[index, k].min = values[k];
+                if (values[k] > gMeasure[index, k].max)
+                    gMeasure[index, k].max = values[k];
+            }
+
+            //--- display value and error with color
+            dgvForm.Rows[index].Cells[3].Value = ((int)(gMeasure[index, 0].avg * 10)) / 10.0;
+            dgvForm.Rows[index].Cells[4].Value = ((int)(gMeasure[index, 1].avg * 10)) / 10.0;
+            dgvForm.Rows[index].Cells[5].Value = ((int)(gMeasure[index, 2].avg * 10)) / 10.0;
+            dgvForm.Rows[index].Cells[6].Value = ((int)(gMeasure[index, 3].avg * 10)) / 10.0;
+            dgvForm.Rows[index].Cells[7].Value = ((int)(gMeasure[index, 4].avg * 10)) / 10.0;
+
+            if (gMeasure[index, 0].avg > gCfg.temp[1] || gMeasure[index, 0].avg < gCfg.temp[2])
+                dgvForm.Rows[index].Cells[3].Style.BackColor = WARNCOLOR;
+            else
+                dgvForm.Rows[index].Cells[3].Style.BackColor = NORMALCOLOR;
+
+            if (gMeasure[index, 1].avg > gCfg.humi[1] || gMeasure[index, 1].avg < gCfg.humi[2])
+                dgvForm.Rows[index].Cells[4].Style.BackColor = WARNCOLOR;
+            else
+                dgvForm.Rows[index].Cells[4].Style.BackColor = NORMALCOLOR;
+
+            if (gMeasure[index, 2].avg > gCfg.tvoc[1] || gMeasure[index, 2].avg < gCfg.tvoc[2])
+                dgvForm.Rows[index].Cells[5].Style.BackColor = WARNCOLOR;
+            else
+                dgvForm.Rows[index].Cells[5].Style.BackColor = NORMALCOLOR;
+
+            if (gMeasure[index, 3].avg > gCfg.fans[1] || gMeasure[index, 3].avg < gCfg.fans[2])
+                dgvForm.Rows[index].Cells[6].Style.BackColor = WARNCOLOR;
+            else
+                dgvForm.Rows[index].Cells[6].Style.BackColor = NORMALCOLOR;
+
+            dgvForm.Rows[index].Cells[7].Style.BackColor = NORMALCOLOR;
+
+            //--- Logging
+            if (gCfg.log_method == 1)   // all
+            {
+                string strDate = dateNow.ToString("yyyyMMdd_hhmmss");
+                string strfile = string.Format("{0}\\{1}_{2}.csv", gCfg.log_dir, gOp.SN[index], gOp.strLogDate);
+                string str = string.Format("{0}, {1}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}, {6:0.0}\r\n",
+                                    strDate, gOp.SN[index], values[0], values[1], values[2], values[3], values[4]);
+                System.IO.File.AppendAllText(strfile, str, Encoding.Default);
+            }
+
+            //--- Display Elapsed Time, GetValues(0:temp, 1:humi, 2:tvoc, 3:fans, 4:battery)
+            string strValue = string.Format("현재값({0},{1}) #read={2}: {3},  {4},  {5},  {6},  {7}", index, gOp.SN[index], gOp.numRead[index], values[0], values[1], values[2], values[3], values[4]);
+            LMessage2.Text = strValue;
+            return;
+
+        }
+
+        private void Write_AverageMinMax(int index)
+        {
+            string[] strResult = { "PASS", "FAIL" };
+
+            string strfile = string.Format("{0}\\{1}_{2}.csv", gCfg.log_dir, gOp.SN[index], gOp.strLogDate);
+            string str = string.Format("AVERAGE, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}\r\n",
+                        gOp.SN[index], gMeasure[index, 0].avg, gMeasure[index, 1].avg,
+                        gMeasure[index, 2].avg, gMeasure[index, 3].avg, gMeasure[index, 4].avg);
+            System.IO.File.AppendAllText(strfile, str, Encoding.Default);
+
+            str = string.Format("MAX, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}\r\n",
+                        gOp.SN[index], gMeasure[index, 0].max, gMeasure[index, 1].max,
+                        gMeasure[index, 2].max, gMeasure[index, 3].max, gMeasure[index, 4].max);
+            System.IO.File.AppendAllText(strfile, str, Encoding.Default);
+
+            str = string.Format("MIN, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}\r\n",
+                        gOp.SN[index], gMeasure[index, 0].min, gMeasure[index, 1].min,
+                        gMeasure[index, 2].min, gMeasure[index, 3].min, gMeasure[index, 4].min);
+            System.IO.File.AppendAllText(strfile, str, Encoding.Default);
+
+            //--- RESULT
+            int[] iFail = new int[5];
+            if (gMeasure[index, 0].avg > gCfg.temp[1] || gMeasure[index, 0].avg < gCfg.temp[2])
+            {
+                dgvForm.Rows[index].Cells[3].Style.BackColor = WARNCOLOR;
+                iFail[0] = 1;
+            }
+            else
+            {
+                dgvForm.Rows[index].Cells[3].Style.BackColor = NORMALCOLOR;
+                iFail[0] = 0;
+            }
+
+            if (gMeasure[index, 1].avg > gCfg.humi[1] || gMeasure[index, 1].avg < gCfg.humi[2])
+            {
+                dgvForm.Rows[index].Cells[4].Style.BackColor = WARNCOLOR;
+                iFail[1] = 1;
+            }
+            else
+            {
+                dgvForm.Rows[index].Cells[4].Style.BackColor = NORMALCOLOR;
+                iFail[1] = 0;
+            }
+
+            if (gMeasure[index, 2].avg > gCfg.tvoc[1] || gMeasure[index, 2].avg < gCfg.tvoc[2])
+            {
+                dgvForm.Rows[index].Cells[5].Style.BackColor = WARNCOLOR;
+                iFail[2] = 1;
+            }
+            else
+            {
+                dgvForm.Rows[index].Cells[5].Style.BackColor = NORMALCOLOR;
+                iFail[2] = 0;
+            }
+
+            if (gMeasure[index, 3].avg > gCfg.fans[1] || gMeasure[index, 3].avg < gCfg.fans[2])
+            {
+                dgvForm.Rows[index].Cells[6].Style.BackColor = WARNCOLOR;
+                iFail[3] = 1;
+            }
+            else
+            {
+                dgvForm.Rows[index].Cells[6].Style.BackColor = NORMALCOLOR;
+                iFail[3] = 0;
+            }
+
+            dgvForm.Rows[index].Cells[7].Style.BackColor = NORMALCOLOR;
+
+            if (iFail[0] == 1 || iFail[1] == 1 || iFail[2] == 1 || iFail[3] == 1)
+            {
+                dgvForm.Rows[index].Cells[8].Style.BackColor = FAILCOLOR;
+                dgvForm.Rows[index].Cells[8].Value = "FAIL";
+                iFail[4] = 1;
+            }
+            else
+            {
+                dgvForm.Rows[index].Cells[8].Style.BackColor = NORMALCOLOR;
+                dgvForm.Rows[index].Cells[8].Value = "PASS";
+                iFail[4] = 0;
+            }
+
+            str = string.Format("RESULT, {0}, {1}, {2}, {3}, {4}, , {5}\r\n",
+                        gOp.SN[index],
+                        strResult[iFail[0]], strResult[iFail[1]],
+                        strResult[iFail[2]], strResult[iFail[3]], strResult[iFail[4]]);
+            System.IO.File.AppendAllText(strfile, str, Encoding.Default);
         }
 
         private void Write_AverageMinMax()
@@ -286,6 +595,8 @@ namespace VCZ1_TOOL
             {
                 if (gOp.SN[i].Length > 0)
                 {
+                    Write_AverageMinMax(i);
+                    /*
                     string strfile = string.Format("{0}\\{1}_{2}.csv", gCfg.log_dir, gOp.SN[i], gOp.strLogDate);
                     string str = string.Format("AVERAGE, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}\r\n",
                                 gOp.SN[i], gMeasure[i, 0].avg, gMeasure[i, 1].avg,
@@ -367,6 +678,7 @@ namespace VCZ1_TOOL
                                 strResult[iFail[0]], strResult[iFail[1]],
                                 strResult[iFail[2]], strResult[iFail[3]], strResult[iFail[4]]);
                     System.IO.File.AppendAllText(strfile, str, Encoding.Default);
+                    */
                 }
             }
 
@@ -395,16 +707,16 @@ namespace VCZ1_TOOL
             timer3000.Enabled = true;
         }
 
-        private void Set_Connection_Status(bool bOk)
+        private void Set_Connection_Status(int index, bool bOk)
         {
             if (bOk)
             {
-                dgvForm.Rows[gOp.curIndex].Cells[2].Value = "OK";
-                dgvForm.Rows[gOp.curIndex].Cells[2].Style.BackColor = NORMALCOLOR;
+                dgvForm.Rows[index].Cells[2].Value = "OK";
+                dgvForm.Rows[index].Cells[2].Style.BackColor = NORMALCOLOR;
             } else
             {
-                dgvForm.Rows[gOp.curIndex].Cells[2].Value = "NG";
-                dgvForm.Rows[gOp.curIndex].Cells[2].Style.BackColor = PAIRFAIL;
+                dgvForm.Rows[index].Cells[2].Value = "NG";
+                dgvForm.Rows[index].Cells[2].Style.BackColor = PAIRFAIL;
             }
         }
 
@@ -517,5 +829,18 @@ namespace VCZ1_TOOL
                 timer500.Enabled = true;
             }
         }
+
+        public async Task<ERROR_CODE> BleConnect(int index, string devName)
+        {
+            ERROR_CODE result = ERROR_CODE.NONE;
+            result = ble[index].StartScan(devName, (d) => { });
+            if (result.Equals(ERROR_CODE.BLE_FOUND_DEVICE))
+            {
+                result = await ble[index].OpenDevice(devName);
+            };
+            return result;
+        }
     }
+
+
 }
