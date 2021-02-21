@@ -340,6 +340,7 @@ namespace ble.multi
                     result = await BleConnect(idx, device_name);
                     if ((result != ERROR_CODE.NONE))
                     {
+                        Task.Delay(9000);
                         continue;
                     }
                 }
@@ -463,15 +464,31 @@ namespace ble.multi
             SetThreadStatus(DeviceList.BLE2, false);
             SetThreadStatus(DeviceList.BLE3, false);
             SetThreadStatus(DeviceList.BLE4, false);
-            if (thread1 != null) thread1.Join();
-            if (thread2 != null) thread2.Join();
-            if (thread3 != null) thread3.Join();
-            if (thread4 != null) thread4.Join();
+            if (thread1 != null) 
+            {
+                thread1.Abort();
+                thread1.Join();
+                thread1 = null;
+            } 
+            if (thread2 != null)
+            {
+                thread2.Abort();
+                thread2.Join();
+                thread2 = null;
+            }
+            if (thread3 != null)
+            {
+                thread3.Abort();
+                thread3.Join();
+                thread2 = null;
+            }
+            if (thread3 != null)
+            {
+                thread3.Abort();
+                thread3.Join();
+                thread3 = null;
+            }
             Task.Delay(1000);
-            listBle1.Items.Add($"thread1.ThreadState: {thread1.ThreadState}");
-            listBle2.Items.Add($"thread2.ThreadState: {thread2.ThreadState}");
-            listBle1.Items.Add($"thread3.ThreadState: {thread1.ThreadState}");
-            listBle2.Items.Add($"thread4.ThreadState: {thread2.ThreadState}");
 
         }
     }
