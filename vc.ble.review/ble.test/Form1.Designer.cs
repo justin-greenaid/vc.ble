@@ -66,6 +66,8 @@ namespace ble.test
             this.button23 = new System.Windows.Forms.Button();
             this.button24 = new System.Windows.Forms.Button();
             this.button25 = new System.Windows.Forms.Button();
+            this.button26 = new System.Windows.Forms.Button();
+            this.button27 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -229,7 +231,7 @@ namespace ble.test
             // 
             // button9
             // 
-            this.button9.Location = new System.Drawing.Point(867, 295);
+            this.button9.Location = new System.Drawing.Point(867, 282);
             this.button9.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(129, 32);
@@ -284,7 +286,7 @@ namespace ble.test
             // 
             // button14
             // 
-            this.button14.Location = new System.Drawing.Point(867, 343);
+            this.button14.Location = new System.Drawing.Point(867, 367);
             this.button14.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button14.Name = "button14";
             this.button14.Size = new System.Drawing.Size(129, 32);
@@ -390,7 +392,7 @@ namespace ble.test
             // 
             // button20
             // 
-            this.button20.Location = new System.Drawing.Point(1001, 343);
+            this.button20.Location = new System.Drawing.Point(1001, 367);
             this.button20.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button20.Name = "button20";
             this.button20.Size = new System.Drawing.Size(129, 32);
@@ -444,7 +446,7 @@ namespace ble.test
             // 
             // button25
             // 
-            this.button25.Location = new System.Drawing.Point(1001, 295);
+            this.button25.Location = new System.Drawing.Point(1001, 282);
             this.button25.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button25.Name = "button25";
             this.button25.Size = new System.Drawing.Size(129, 32);
@@ -453,11 +455,35 @@ namespace ble.test
             this.button25.UseVisualStyleBackColor = true;
             this.button25.Click += new System.EventHandler(this.button25_Click);
             // 
+            // button26
+            // 
+            this.button26.Location = new System.Drawing.Point(867, 318);
+            this.button26.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.button26.Name = "button26";
+            this.button26.Size = new System.Drawing.Size(129, 32);
+            this.button26.TabIndex = 37;
+            this.button26.Text = "Co2";
+            this.button26.UseVisualStyleBackColor = true;
+            this.button26.Click += new System.EventHandler(this.button26_Click_1);
+            // 
+            // button27
+            // 
+            this.button27.Location = new System.Drawing.Point(1001, 318);
+            this.button27.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.button27.Name = "button27";
+            this.button27.Size = new System.Drawing.Size(129, 32);
+            this.button27.TabIndex = 38;
+            this.button27.Text = "Co2";
+            this.button27.UseVisualStyleBackColor = true;
+            this.button27.Click += new System.EventHandler(this.button27_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1181, 662);
+            this.Controls.Add(this.button27);
+            this.Controls.Add(this.button26);
             this.Controls.Add(this.button20);
             this.Controls.Add(this.button21);
             this.Controls.Add(this.button22);
@@ -541,6 +567,8 @@ namespace ble.test
         private System.Windows.Forms.Button button23;
         private System.Windows.Forms.Button button24;
         private System.Windows.Forms.Button button25;
+        private System.Windows.Forms.Button button26;
+        private System.Windows.Forms.Button button27;
     }
 }
 

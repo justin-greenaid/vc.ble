@@ -449,7 +449,8 @@ namespace ble.test
         PulseOximetryControlPoint = 0x2A62,
         PulseOximetryFeatures = 0x2A61,
         PulseOximetryPulsatileEvent = 0x2A60,
-        SimpleKeyState = 0xFFE1
+        SimpleKeyState = 0xFFE1,
+        Co2 = 0x9100
     }
 
     // Manufacture Specific Service UUID

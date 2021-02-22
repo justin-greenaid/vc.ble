@@ -25,7 +25,7 @@ namespace ble.multi
         string char_TVOC = "EnvironmentalSensing/TVOC";
         string char_FanSpeed = "VCService/FanSpeed";
         string char_BatteryLevel = "Battery/BatteryLevel";
-
+        string char_Co2 = "EnvironmentalSensing/Co2";
 
         Thread thread1 = null;
         Thread thread2 = null;
@@ -193,6 +193,42 @@ namespace ble.multi
             return result;
         }
 
+        string ConvertUnit(string item, string dataString)
+        {
+            string[] srVals = { "0", "0", "0", "0" };
+            double resultSum = 0.0;
+            switch (item) {
+                case "Temperature":
+                    srVals = dataString.Split(' ');
+                    resultSum = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    resultSum = resultSum / 100.0;
+                    break;
+                case "Humidity":
+                    srVals = dataString.Split(' ');
+                    resultSum = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    resultSum = resultSum / 100.0;
+                    break;
+                case "TVOC":
+                    srVals = dataString.Split(' ');
+                    resultSum = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    break;
+                case "FanSpeed":
+                    srVals = dataString.Split(' ');
+                    resultSum = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    break;
+                    
+                case "BatteryLevel":
+                    resultSum = int.Parse(dataString);
+                    break;
+
+                case "Co2":
+                    srVals = dataString.Split(' ');
+                    resultSum = int.Parse(srVals[3]) * 16777215 + int.Parse(srVals[2]) * 655536 + int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    
+                    break;
+            }
+            return resultSum.ToString();
+        }
         private async Task<ERROR_CODE> BleGetCharacteristic(DeviceList idx, string devName, string characterName)
         {
             ERROR_CODE result = ERROR_CODE.NONE;
@@ -206,7 +242,9 @@ namespace ble.multi
                         result = await ble1.ReadCharacteristic(devName, characterName);
                         if (result == ERROR_CODE.NONE)
                         {
-                            showmessage(idx, $"{parts[1]}: {ble1.getCharacteristic()}");
+                            var readChar = ble1.getCharacteristic();
+                            var resultString = ConvertUnit(parts[1], readChar);
+                            showmessage(idx, $"{parts[1]}: {readChar} => {resultString}");
                         }
                         else
                         {
@@ -217,7 +255,9 @@ namespace ble.multi
                         result = await ble2.ReadCharacteristic(devName, characterName);
                         if (result == ERROR_CODE.NONE)
                         {
-                            showmessage(idx, $"{parts[1]}: {ble2.getCharacteristic()}");
+                            var readChar = ble2.getCharacteristic();
+                            var resultString = ConvertUnit(parts[1], readChar);
+                            showmessage(idx, $"{parts[1]}: {readChar} => {resultString}");
                         }
                         else
                         {
@@ -228,7 +268,9 @@ namespace ble.multi
                         result = await ble3.ReadCharacteristic(devName, characterName);
                         if (result == ERROR_CODE.NONE)
                         {
-                            showmessage(idx, $"{parts[1]}: {ble3.getCharacteristic()}");
+                            var readChar = ble3.getCharacteristic();
+                            var resultString = ConvertUnit(parts[1], readChar);
+                            showmessage(idx, $"{parts[1]}: {readChar} => {resultString}");
                         }
                         else
                         {
@@ -239,7 +281,9 @@ namespace ble.multi
                         result = await ble4.ReadCharacteristic(devName, characterName);
                         if (result == ERROR_CODE.NONE)
                         {
-                            showmessage(idx, $"{parts[1]}: {ble4.getCharacteristic()}");
+                            var readChar = ble4.getCharacteristic();
+                            var resultString = ConvertUnit(parts[1], readChar);
+                            showmessage(idx, $"{parts[1]}: {readChar} => {resultString}");
                         }
                         else
                         {
@@ -365,6 +409,11 @@ namespace ble.multi
                     continue;
                 }
                 result = await BleGetCharacteristic(idx, device_name, char_BatteryLevel);
+                if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                {
+                    continue;
+                }
+                result = await BleGetCharacteristic(idx, device_name, char_Co2);
                 if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
                 {
                     continue;

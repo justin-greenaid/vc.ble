@@ -406,6 +406,33 @@ namespace ble.test
         private void button26_Click(object sender, EventArgs e)
         {
         }
+
+        private async void button26_Click_1(object sender, EventArgs e)
+        {
+            string dev_name = textBox1.Text.ToString();
+            string characteristic_name = "EnvironmentalSensing/Co2";
+            listStatus.Items.Add($"set {characteristic_name}");
+            var error_code = await ble.ReadCharacteristic(dev_name, characteristic_name);
+            listStatus.Items.Add($"ErrorCode: {error_code}");
+            if (error_code == ERROR_CODE.NONE)
+            {
+                listStatus.Items.Add($"{characteristic_name}: {ble.getCharacteristic()}");
+            }
+        }
+
+        private async void button27_Click(object sender, EventArgs e)
+        {
+            string dev_name = textBox3.Text.ToString();
+            string characteristic_name = "EnvironmentalSensing/Co2";
+            listStatus.Items.Add($"set {characteristic_name}");
+            var error_code = await ble2.ReadCharacteristic(dev_name, characteristic_name);
+            listStatus.Items.Add($"ErrorCode: {error_code}");
+            if (error_code == ERROR_CODE.NONE)
+            {
+                listStatus.Items.Add($"{characteristic_name}: {ble2.getCharacteristic()}");
+            }
+
+        }
     }
 }
 
