@@ -349,7 +349,7 @@ namespace VCZ1_TOOL
                     string srData;
 
                     ERROR_CODE error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
-                    if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                    if ((error_code == ERROR_CODE.BLE_NO_CONNECTED) || (error_code != ERROR_CODE.NONE))
                     {
                         continue;
                     }
@@ -363,7 +363,7 @@ namespace VCZ1_TOOL
                     // 습도
                     characteristic_name = "EnvironmentalSensing/Humidity";
                     error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
-                    if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                    if ((error_code == ERROR_CODE.BLE_NO_CONNECTED) || (error_code != ERROR_CODE.NONE))
                     {
                         continue;
                     }
@@ -377,7 +377,7 @@ namespace VCZ1_TOOL
                     // TVOC
                     characteristic_name = "EnvironmentalSensing/TVOC";
                     error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
-                    if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                    if ((error_code == ERROR_CODE.BLE_NO_CONNECTED) || (error_code != ERROR_CODE.NONE))
                     {
                         continue;
                     }
@@ -391,7 +391,7 @@ namespace VCZ1_TOOL
                     // FANSPEED
                     characteristic_name = "VCService/FanSpeed";
                     error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
-                    if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                    if ((error_code == ERROR_CODE.BLE_NO_CONNECTED) || (error_code != ERROR_CODE.NONE))
                     {
                         continue;
                     }
@@ -404,7 +404,7 @@ namespace VCZ1_TOOL
                     // BATTERY
                     characteristic_name = "Battery/BatteryLevel";
                     error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
-                    if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                    if ((error_code == ERROR_CODE.BLE_NO_CONNECTED) || (error_code != ERROR_CODE.NONE))
                     {
                         continue;
                     }
