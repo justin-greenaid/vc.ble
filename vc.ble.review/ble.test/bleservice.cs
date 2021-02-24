@@ -127,24 +127,28 @@ namespace ble.test
             return _resultCharacteristic;
         }
 
+        public string GetErrorString(ERROR_CODE param)
+        { 
+            return "ERROR_CODE." + param.ToString();
+        }
         /// <summary>
         /// This function reads data from the specific BLE characteristic 
         /// </summary>
         /// <param name="param"></param>
-        public async Task<ERROR_CODE> ReadCharacteristic(string devName, string param)
+        public async Task<string> ReadCharacteristic(string devName, string param)
         {
-            ERROR_CODE task_result = ERROR_CODE.UNKNOWN_ERROR;
+            string task_result = GetErrorString(ERROR_CODE.UNKNOWN_ERROR);
             try
             {
                 if (ConnnectionStatus(devName) != ERROR_CODE.BLE_CONNECTED)
                 {
-                    task_result = ERROR_CODE.BLE_NO_CONNECTED;
+                    task_result = GetErrorString(ERROR_CODE.BLE_NO_CONNECTED);
                     Console.WriteLine("No BLE device connected.");
                     return task_result;
                 }
                 if (string.IsNullOrEmpty(param))
                 {
-                    task_result = ERROR_CODE.CMD_WRONG_PARAMETER;
+                    task_result = GetErrorString(ERROR_CODE.CMD_WRONG_PARAMETER);
                     Console.WriteLine("Nothing to read, please specify characteristic name or #.");
                     return task_result;
                 }
@@ -179,7 +183,7 @@ namespace ble.test
                         catch (Exception ex)
                         {
                             Console.WriteLine($"READ_EXCEPTION_2. Can't read characteristics: {ex.Message}");
-                            task_result = ERROR_CODE.READ_EXCEPTION_2;
+                            task_result = GetErrorString(ERROR_CODE.READ_EXCEPTION_2);
                         }
 
                         foreach (var c in characteristics)
@@ -191,7 +195,7 @@ namespace ble.test
                     if (_selectedService == null)
                     {
                         Console.WriteLine("No service is selected.");
-                        task_result = ERROR_CODE.NO_SELECTED_SERVICE;
+                        task_result = GetErrorString(ERROR_CODE.NO_SELECTED_SERVICE);
                     }
                     chars = new List<BluetoothLEAttributeDisplay>(_characteristics);
                     charName = parts[0];
@@ -201,7 +205,7 @@ namespace ble.test
                 if (chars.Count == 0)
                 {
                     Console.WriteLine("No Characteristics");
-                    task_result = ERROR_CODE.READ_NOTHING_TO_READ;
+                    task_result = GetErrorString(ERROR_CODE.READ_NOTHING_TO_READ);
                     return task_result;
                 }
                 if (chars.Count > 0 && !string.IsNullOrEmpty(charName))
@@ -217,18 +221,18 @@ namespace ble.test
                         {
                             Console.WriteLine(Utilities.FormatValue(result.Value, _dataFormat));
                             _resultCharacteristic = Utilities.FormatValue(result.Value, _dataFormat);
-                            task_result = ERROR_CODE.NONE;
+                            task_result = GetErrorString(ERROR_CODE.NONE) + " " + _resultCharacteristic;
                         }
                         else
                         {
                             Console.WriteLine($"Read failed: {result.Status}");
-                            task_result = ERROR_CODE.READ_FAIL;
+                            task_result = GetErrorString(ERROR_CODE.READ_FAIL);
                         }
                     }
                     else
                     {
                         Console.WriteLine($"Invalid characteristic {charName}");
-                        task_result = ERROR_CODE.READ_INVALID_CHARACTERISTIC;
+                        task_result = GetErrorString(ERROR_CODE.READ_INVALID_CHARACTERISTIC);
                     }
 
                 }
@@ -236,7 +240,7 @@ namespace ble.test
             catch (Exception ex)
             {
                 Console.WriteLine($"READ_EXCEPTION_1. Can't read characteristics: {ex.Message}");
-                task_result = ERROR_CODE.READ_EXCEPTION_1;
+                task_result = GetErrorString(ERROR_CODE.READ_EXCEPTION_1);
             }
             return task_result;
         }

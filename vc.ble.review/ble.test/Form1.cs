@@ -66,13 +66,8 @@ namespace ble.test
                     break;
 
                 case TaskName.READ_CHARACTERISTIC:
-                    result = await ble.ReadCharacteristic(arg1, arg2);
-                    listStatus.Items.Add($"ErrorCode: {result}");
-                    if (result == ERROR_CODE.NONE)
-                    {
-                        var readstring = ble.getCharacteristic();
-                        listStatus.Items.Add($"Result: {readstring}");
-                    }
+                    var resultString = await ble.ReadCharacteristic(arg1, arg2);
+                    listStatus.Items.Add($"{resultString}");              
                     break;
 
             }
@@ -172,9 +167,7 @@ namespace ble.test
             string characteristic_name = "Battery/BatteryLevel";
             listStatus.Items.Add($"set {characteristic_name}");
             var error_code = await ble.ReadCharacteristic(dev_name, characteristic_name);
-            listStatus.Items.Add($"ErrorCode: {error_code}");
-            if (error_code == ERROR_CODE.NONE)
-                listStatus.Items.Add($"{characteristic_name}: {ble.getCharacteristic()}");
+            listStatus.Items.Add($"{error_code}");
         }
 
         /// <summary>
@@ -188,11 +181,7 @@ namespace ble.test
             string characteristic_name = "EnvironmentalSensing/Temperature";
             listStatus.Items.Add($"set {characteristic_name}");
             var error_code = await ble.ReadCharacteristic(dev_name, characteristic_name);
-            listStatus.Items.Add($"ErrorCode: {error_code}");
-            if (error_code == ERROR_CODE.NONE)
-            {
-                listStatus.Items.Add($"{characteristic_name}: {ble.getCharacteristic()}");
-            }
+            listStatus.Items.Add($"{error_code}");
         }
         /// <summary>
         /// click Humidity button
@@ -205,11 +194,7 @@ namespace ble.test
             string characteristic_name = "EnvironmentalSensing/Humidity";
             listStatus.Items.Add($"set {characteristic_name}");
             var error_code = await ble.ReadCharacteristic(dev_name, characteristic_name);
-            listStatus.Items.Add($"ErrorCode: {error_code}");
-            if (error_code == ERROR_CODE.NONE) 
-            {
-                listStatus.Items.Add($"{characteristic_name}: {ble.getCharacteristic()}");
-            }
+            listStatus.Items.Add($"{error_code}");
         }
 
         /// <summary>
@@ -223,11 +208,7 @@ namespace ble.test
             string characteristic_name = "EnvironmentalSensing/TVOC";
             listStatus.Items.Add($"set {characteristic_name}");
             var error_code = await ble.ReadCharacteristic(dev_name, characteristic_name);
-            listStatus.Items.Add($"ErrorCode: {error_code}");
-            if (error_code == ERROR_CODE.NONE)
-            {
-                listStatus.Items.Add($"{characteristic_name}: {ble.getCharacteristic()}");
-            }
+            listStatus.Items.Add($"{error_code}");
         }
         /// <summary>
         /// click FanSpeed button 
@@ -240,12 +221,7 @@ namespace ble.test
             string characteristic_name = "VCService/FanSpeed";
             listStatus.Items.Add($"set {characteristic_name}");
             var error_code = await ble.ReadCharacteristic(dev_name, characteristic_name);
-            listStatus.Items.Add($"ErrorCode: {error_code}");
-            if (error_code == ERROR_CODE.NONE)
-            {
-                listStatus.Items.Add($"{characteristic_name}: {ble.getCharacteristic()}");
-            }
-
+            listStatus.Items.Add($"{error_code}");
         }
 
         private void button15_Click(object sender, EventArgs e)
@@ -341,11 +317,7 @@ namespace ble.test
             string characteristic_name = "EnvironmentalSensing/Temperature";
             listStatus.Items.Add($"set {characteristic_name}");
             var error_code = await ble2.ReadCharacteristic(dev_name, characteristic_name);
-            listStatus.Items.Add($"ErrorCode: {error_code}");
-            if (error_code == ERROR_CODE.NONE)
-            {
-                listStatus.Items.Add($"{characteristic_name}: {ble2.getCharacteristic()}");
-            }
+            listStatus.Items.Add($"{error_code}");
         }
 
         private async void button23_Click(object sender, EventArgs e)
@@ -354,11 +326,7 @@ namespace ble.test
             string characteristic_name = "EnvironmentalSensing/Humidity";
             listStatus.Items.Add($"set {characteristic_name}");
             var error_code = await ble2.ReadCharacteristic(dev_name, characteristic_name);
-            listStatus.Items.Add($"ErrorCode: {error_code}");
-            if (error_code == ERROR_CODE.NONE)
-            {
-                listStatus.Items.Add($"{characteristic_name}: {ble2.getCharacteristic()}");
-            }
+            listStatus.Items.Add($"{error_code}");
         }
 
         private async void button22_Click(object sender, EventArgs e)
@@ -367,11 +335,7 @@ namespace ble.test
             string characteristic_name = "EnvironmentalSensing/TVOC";
             listStatus.Items.Add($"set {characteristic_name}");
             var error_code = await ble2.ReadCharacteristic(dev_name, characteristic_name);
-            listStatus.Items.Add($"ErrorCode: {error_code}");
-            if (error_code == ERROR_CODE.NONE)
-            {
-                listStatus.Items.Add($"{characteristic_name}: {ble2.getCharacteristic()}");
-            }
+            listStatus.Items.Add($"{error_code}");
         }
 
         private async void button21_Click(object sender, EventArgs e)
@@ -380,11 +344,7 @@ namespace ble.test
             string characteristic_name = "VCService/FanSpeed";
             listStatus.Items.Add($"set {characteristic_name}");
             var error_code = await ble2.ReadCharacteristic(dev_name, characteristic_name);
-            listStatus.Items.Add($"ErrorCode: {error_code}");
-            if (error_code == ERROR_CODE.NONE)
-            {
-                listStatus.Items.Add($"{characteristic_name}: {ble2.getCharacteristic()}");
-            }
+            listStatus.Items.Add($"{error_code}");
         }
 
         private async void button25_Click(object sender, EventArgs e)
@@ -393,9 +353,7 @@ namespace ble.test
             string characteristic_name = "Battery/BatteryLevel";
             listStatus.Items.Add($"set {characteristic_name}");
             var error_code = await ble2.ReadCharacteristic(dev_name, characteristic_name);
-            listStatus.Items.Add($"ErrorCode: {error_code}");
-            if (error_code == ERROR_CODE.NONE)
-                listStatus.Items.Add($"{characteristic_name}: {ble2.getCharacteristic()}");
+            listStatus.Items.Add($"{error_code}");
         }
 
         private void button14_Click(object sender, EventArgs e)
@@ -413,11 +371,7 @@ namespace ble.test
             string characteristic_name = "EnvironmentalSensing/Co2";
             listStatus.Items.Add($"set {characteristic_name}");
             var error_code = await ble.ReadCharacteristic(dev_name, characteristic_name);
-            listStatus.Items.Add($"ErrorCode: {error_code}");
-            if (error_code == ERROR_CODE.NONE)
-            {
-                listStatus.Items.Add($"{characteristic_name}: {ble.getCharacteristic()}");
-            }
+            listStatus.Items.Add($"{error_code}");
         }
 
         private async void button27_Click(object sender, EventArgs e)
@@ -426,11 +380,7 @@ namespace ble.test
             string characteristic_name = "EnvironmentalSensing/Co2";
             listStatus.Items.Add($"set {characteristic_name}");
             var error_code = await ble2.ReadCharacteristic(dev_name, characteristic_name);
-            listStatus.Items.Add($"ErrorCode: {error_code}");
-            if (error_code == ERROR_CODE.NONE)
-            {
-                listStatus.Items.Add($"{characteristic_name}: {ble2.getCharacteristic()}");
-            }
+            listStatus.Items.Add($"{error_code}");
 
         }
     }

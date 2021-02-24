@@ -195,26 +195,26 @@ namespace ble.multi
 
         string ConvertUnit(string item, string dataString)
         {
-            string[] srVals = { "0", "0", "0", "0" };
+            string[] srVals = { "0", "0", "0", "0", "0" };
             double resultSum = 0.0;
             switch (item) {
                 case "Temperature":
                     srVals = dataString.Split(' ');
-                    resultSum = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    resultSum = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     resultSum = resultSum / 100.0;
                     break;
                 case "Humidity":
                     srVals = dataString.Split(' ');
-                    resultSum = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    resultSum = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     resultSum = resultSum / 100.0;
                     break;
                 case "TVOC":
                     srVals = dataString.Split(' ');
-                    resultSum = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    resultSum = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     break;
                 case "FanSpeed":
                     srVals = dataString.Split(' ');
-                    resultSum = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    resultSum = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     break;
                     
                 case "BatteryLevel":
@@ -223,15 +223,15 @@ namespace ble.multi
 
                 case "Co2":
                     srVals = dataString.Split(' ');
-                    resultSum = int.Parse(srVals[3]) * 16777215 + int.Parse(srVals[2]) * 655536 + int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    resultSum = int.Parse(srVals[4]) * 16777215 + int.Parse(srVals[3]) * 655536 + int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     
                     break;
             }
             return resultSum.ToString();
         }
-        private async Task<ERROR_CODE> BleGetCharacteristic(DeviceList idx, string devName, string characterName)
+        private async Task<string> BleGetCharacteristic(DeviceList idx, string devName, string characterName)
         {
-            ERROR_CODE result = ERROR_CODE.NONE;
+            string resultString = "";
             
             try
             {
@@ -239,65 +239,61 @@ namespace ble.multi
                 switch (idx)
                 {
                     case DeviceList.BLE1:
-                        result = await ble1.ReadCharacteristic(devName, characterName);
-                        if (result == ERROR_CODE.NONE)
+                        resultString = await ble1.ReadCharacteristic(devName, characterName);
+                        if (resultString.StartsWith("ERROR_CODE.NONE"))
                         {
-                            var readChar = ble1.getCharacteristic();
-                            var resultString = ConvertUnit(parts[1], readChar);
-                            showmessage(idx, $"{parts[1]}: {readChar} => {resultString}");
+                            var resultData = ConvertUnit(parts[1], resultString);
+                            showmessage(idx, $"{parts[1]}: {resultData}");
                         }
                         else
                         {
-                            showmessage(idx, $"{parts[1]}:ErrorCode: {result}");
+                            showmessage(idx, $"{parts[1]}: {resultString}");
                         }
                         break;
                     case DeviceList.BLE2:
-                        result = await ble2.ReadCharacteristic(devName, characterName);
-                        if (result == ERROR_CODE.NONE)
+                        resultString = await ble2.ReadCharacteristic(devName, characterName);
+                        if (resultString.StartsWith("ERROR_CODE.NONE"))
                         {
-                            var readChar = ble2.getCharacteristic();
-                            var resultString = ConvertUnit(parts[1], readChar);
-                            showmessage(idx, $"{parts[1]}: {readChar} => {resultString}");
+                            var resultData = ConvertUnit(parts[1], resultString);
+                            showmessage(idx, $"{parts[1]}: {resultData}");
                         }
                         else
                         {
-                            showmessage(idx, $"{parts[1]}:ErrorCode: {result}");
+                            showmessage(idx, $"{parts[1]}: {resultString}");
                         }
                         break;
                     case DeviceList.BLE3:
-                        result = await ble3.ReadCharacteristic(devName, characterName);
-                        if (result == ERROR_CODE.NONE)
+                        resultString = await ble3.ReadCharacteristic(devName, characterName);
+                        if (resultString.StartsWith("ERROR_CODE.NONE"))
                         {
-                            var readChar = ble3.getCharacteristic();
-                            var resultString = ConvertUnit(parts[1], readChar);
-                            showmessage(idx, $"{parts[1]}: {readChar} => {resultString}");
+                            var resultData = ConvertUnit(parts[1], resultString);
+                            showmessage(idx, $"{parts[1]}: {resultData}");
                         }
                         else
                         {
-                            showmessage(idx, $"{parts[1]}:ErrorCode: {result}");
+                            showmessage(idx, $"{parts[1]}: {resultString}");
                         }
                         break;
                     case DeviceList.BLE4:
-                        result = await ble4.ReadCharacteristic(devName, characterName);
-                        if (result == ERROR_CODE.NONE)
+                        resultString = await ble4.ReadCharacteristic(devName, characterName);
+                        if (resultString.StartsWith("ERROR_CODE.NONE"))
                         {
-                            var readChar = ble4.getCharacteristic();
-                            var resultString = ConvertUnit(parts[1], readChar);
-                            showmessage(idx, $"{parts[1]}: {readChar} => {resultString}");
+                            var resultData = ConvertUnit(parts[1], resultString);
+                            showmessage(idx, $"{parts[1]}: {resultData}");
                         }
                         else
                         {
-                            showmessage(idx, $"{parts[1]}:ErrorCode: {result}");
+                            showmessage(idx, $"{parts[1]}: {resultString}");
                         }
                         break;
                 }
             }
             catch (Exception ex)
             {
-                result = ERROR_CODE.READ_EXCEPTION_1;
+                resultString = "ERROR_CODE." + ERROR_CODE.READ_EXCEPTION_1.ToString();
                 Console.WriteLine($"Read Exception");
             }
-            return result;
+            return resultString;
         }
 
         public ERROR_CODE GetDeviceConnectionStatus(DeviceList idx)
@@ -375,7 +371,8 @@ namespace ble.multi
 
 
             ERROR_CODE result = ERROR_CODE.NONE;
-            
+            string resultString = " ";
+
             while (GetThreadStatus(idx)) {
                 
                 if (GetDeviceConnectionStatus(idx) == ERROR_CODE.BLE_NO_CONNECTED)
@@ -388,33 +385,38 @@ namespace ble.multi
                         continue;
                     }
                 }
-                result = await BleGetCharacteristic(idx, device_name, char_temp);
-                if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE)) 
+                resultString = await BleGetCharacteristic(idx, device_name, char_temp);
+                if (!resultString.StartsWith("ERROR_CODE.NONE")) 
                 {
                     continue;
                 }
-                result = await BleGetCharacteristic(idx, device_name, char_humidity);
-                if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                resultString = await BleGetCharacteristic(idx, device_name, char_humidity);
+                if (!resultString.StartsWith("ERROR_CODE.NONE"))
                 {
                     continue;
                 }
-                result = await BleGetCharacteristic(idx, device_name, char_TVOC);
-                if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                resultString = await BleGetCharacteristic(idx, device_name, char_TVOC);
+                if (!resultString.StartsWith("ERROR_CODE.NONE"))
                 {
                     continue;
                 }
-                result = await BleGetCharacteristic(idx, device_name, char_FanSpeed);
-                if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                resultString = await BleGetCharacteristic(idx, device_name, char_Co2);
+                if (!resultString.StartsWith("ERROR_CODE.NONE"))
                 {
                     continue;
                 }
-                result = await BleGetCharacteristic(idx, device_name, char_BatteryLevel);
-                if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                resultString = await BleGetCharacteristic(idx, device_name, char_FanSpeed);
+                if (!resultString.StartsWith("ERROR_CODE.NONE"))
                 {
                     continue;
                 }
-                result = await BleGetCharacteristic(idx, device_name, char_Co2);
-                if ((result == ERROR_CODE.BLE_NO_CONNECTED) || (result != ERROR_CODE.NONE))
+                resultString = await BleGetCharacteristic(idx, device_name, char_BatteryLevel);
+                if (!resultString.StartsWith("ERROR_CODE.NONE"))
+                {
+                    continue;
+                }
+                resultString = await BleGetCharacteristic(idx, device_name, char_Co2);
+                if (!resultString.StartsWith("ERROR_CODE.NONE"))
                 {
                     continue;
                 }
