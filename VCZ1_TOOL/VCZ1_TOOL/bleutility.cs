@@ -30,6 +30,7 @@ namespace VCZ1_TOOL
     {
         // ERROR_NONE
         NONE,
+        CMD_WRONG_PARAMETER,
         // INFORMATION ENUM
         BLE_FOUND_DEVICE,
         BLE_CONNECTED,
@@ -57,7 +58,9 @@ namespace VCZ1_TOOL
         READ_FAIL,
         READ_INVALID_CHARACTERISTIC,
         READ_NOTHING_TO_READ,
-
+        READ_EXCEPTION_1,
+        READ_EXCEPTION_2,
+        READ_EXCEPTION_3,
         // Pair
         PAIRED_BLE,
         PAIRING_ALREADY_CONNECTED,

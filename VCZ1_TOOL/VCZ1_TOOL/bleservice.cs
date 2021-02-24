@@ -16,13 +16,10 @@ namespace VCZ1_TOOL
     public class Bleservice
     {
         // "Magic" string for all BLE devices
-        //string _aqsAllBLEDevices = "(System.Devices.Aep.ProtocolId:=\"{bb7bb05e-5972-42b5-94fc-76eaa7084d49}\")";
-        //string[] _requestedBLEProperties = { "System.Devices.Aep.DeviceAddress", "System.Devices.Aep.IsConnected", "System.Devices.Aep.Bluetooth.Le.IsConnectable", };
-
         string[] _requestedBLEProperties = { "System.Devices.Aep.DeviceAddress", "System.Devices.Aep.IsConnected", "System.Devices.Aep.Bluetooth.Le.IsConnectable" };
 
         // BT_Code: Example showing paired and non-paired in a single query.
-        string _aqsAllBLEDevices = "(System.Devices.Aep.ProtocolId:=\"{bb7bb05e-5972-42b5-94fc-76eaa7084d49}\")";
+        //string _aqsAllBLEDevices = "(System.Devices.Aep.ProtocolId:=\"{bb7bb05e-5972-42b5-94fc-76eaa7084d49}\")";
 
         ObservableCollection<BluetoothLEDeviceDisplay> KnownDevices = new ObservableCollection<BluetoothLEDeviceDisplay>();
         List<DeviceInformation> _deviceList = new List<DeviceInformation>();
@@ -32,7 +29,6 @@ namespace VCZ1_TOOL
         BluetoothLEAttributeDisplay _selectedService = null;
 
         List<BluetoothLEAttributeDisplay> _characteristics = new List<BluetoothLEAttributeDisplay>();
-        BluetoothLEAttributeDisplay _selectedCharacteristic = null;
         string _resultCharacteristic = null;
 
         // Only one registered characteristic at a time.
@@ -40,27 +36,6 @@ namespace VCZ1_TOOL
 
         // Current data format
         DataFormat _dataFormat = DataFormat.Dec;
-
-        string _versionInfo;
-
-        // Variables for "foreach" loop implementation
-        List<string> _forEachCommands = new List<string>();
-        List<string> _forEachDeviceNames = new List<string>();
-        int _forEachCmdCounter = 0;
-        int _forEachDeviceCounter = 0;
-        bool _forEachCollection = false;
-        bool _forEachExecution = false;
-        string _forEachDeviceMask = "";
-        int _inIfBlock = 0;
-        bool _failedConditional = false;
-        bool _closingIfBlock = false;
-        int _exitCode = 0;
-        ManualResetEvent _notifyCompleteEvent = null;
-        ManualResetEvent _delayEvent = null;
-        bool _primed = false;
-
-        string ble_device = "VC Z1 15A0";
-
         TimeSpan _timeout = TimeSpan.FromSeconds(3);
        
         public Bleservice()
@@ -159,101 +134,109 @@ namespace VCZ1_TOOL
         public async Task<ERROR_CODE> ReadCharacteristic(string devName, string param)
         {
             ERROR_CODE task_result = ERROR_CODE.UNKNOWN_ERROR;
-
-            if (ConnnectionStatus(devName) != ERROR_CODE.BLE_CONNECTED)
+            try
             {
-                task_result = ERROR_CODE.BLE_NO_CONNECTED;
-                Console.WriteLine("No BLE device connected.");
-                return task_result;
-            }
-            if (string.IsNullOrEmpty(param))
-            {
-                task_result = ERROR_CODE.READ_NOTHING_TO_READ;
-                Console.WriteLine("Nothing to read, please specify characteristic name or #.");
-                return task_result;
-            }
-
-            List<BluetoothLEAttributeDisplay> chars = new List<BluetoothLEAttributeDisplay>();
-
-            string charName = string.Empty;
-            var parts = param.Split('/');
-            // Do we have parameter is in "service/characteristic" format?
-            if (parts.Length == 2)
-            {
-                string serviceName = Utilities.GetIdByNameOrNumber(_services, parts[0]);
-                charName = parts[1];
-
-                // If device is found, connect to device and enumerate all services
-                if (!string.IsNullOrEmpty(serviceName))
+                if (ConnnectionStatus(devName) != ERROR_CODE.BLE_CONNECTED)
                 {
-                    var attr = _services.FirstOrDefault(s => s.Name.Equals(serviceName));
-                    IReadOnlyList<GattCharacteristic> characteristics = new List<GattCharacteristic>();
+                    task_result = ERROR_CODE.BLE_NO_CONNECTED;
+                    Console.WriteLine("No BLE device connected.");
+                    return task_result;
+                }
+                if (string.IsNullOrEmpty(param))
+                {
+                    task_result = ERROR_CODE.CMD_WRONG_PARAMETER;
+                    Console.WriteLine("Nothing to read, please specify characteristic name or #.");
+                    return task_result;
+                }
 
-                    try
+                List<BluetoothLEAttributeDisplay> chars = new List<BluetoothLEAttributeDisplay>();
+
+                string charName = string.Empty;
+                var parts = param.Split('/');
+                // Do we have parameter is in "service/characteristic" format?
+                if (parts.Length == 2)
+                {
+                    string serviceName = Utilities.GetIdByNameOrNumber(_services, parts[0]);
+                    charName = parts[1];
+
+                    // If device is found, connect to device and enumerate all services
+                    if (!string.IsNullOrEmpty(serviceName))
                     {
-                        // Ensure we have access to the device.
-                        var accessStatus = await attr.service.RequestAccessAsync();
-                        if (accessStatus == DeviceAccessStatus.Allowed)
+                        var attr = _services.FirstOrDefault(s => s.Name.Equals(serviceName));
+                        IReadOnlyList<GattCharacteristic> characteristics = new List<GattCharacteristic>();
+
+                        try
                         {
-                            var result = await attr.service.GetCharacteristicsAsync(BluetoothCacheMode.Uncached);
-                            if (result.Status == GattCommunicationStatus.Success)
-                                characteristics = result.Characteristics;
+                            // Ensure we have access to the device.
+                            var accessStatus = await attr.service.RequestAccessAsync();
+                            if (accessStatus == DeviceAccessStatus.Allowed)
+                            {
+                                var result = await attr.service.GetCharacteristicsAsync(BluetoothCacheMode.Uncached);
+                                if (result.Status == GattCommunicationStatus.Success)
+                                    characteristics = result.Characteristics;
+                            }
                         }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"READ_EXCEPTION_2. Can't read characteristics: {ex.Message}");
+                            task_result = ERROR_CODE.READ_EXCEPTION_2;
+                        }
+
+                        foreach (var c in characteristics)
+                            chars.Add(new BluetoothLEAttributeDisplay(c));
                     }
-                    catch (Exception ex)
+                }
+                else if (parts.Length == 1)
+                {
+                    if (_selectedService == null)
                     {
-                        Console.WriteLine($"Restricted service. Can't read characteristics: {ex.Message}");
-                        task_result = ERROR_CODE.READ_FAIL;
+                        Console.WriteLine("No service is selected.");
+                        task_result = ERROR_CODE.NO_SELECTED_SERVICE;
                     }
-
-                    foreach (var c in characteristics)
-                        chars.Add(new BluetoothLEAttributeDisplay(c));
+                    chars = new List<BluetoothLEAttributeDisplay>(_characteristics);
+                    charName = parts[0];
                 }
-            }
-            else if (parts.Length == 1)
-            {
-                if (_selectedService == null)
+
+                // Read characteristic
+                if (chars.Count == 0)
                 {
-                    Console.WriteLine("No service is selected.");
-                    task_result = ERROR_CODE.NO_SELECTED_SERVICE;
+                    Console.WriteLine("No Characteristics");
+                    task_result = ERROR_CODE.READ_NOTHING_TO_READ;
+                    return task_result;
                 }
-                chars = new List<BluetoothLEAttributeDisplay>(_characteristics);
-                charName = parts[0];
-            }
-
-            // Read characteristic
-            if (chars.Count == 0)
-            {
-                Console.WriteLine("No Characteristics");
-                task_result = ERROR_CODE.READ_NOTHING_TO_READ;
-                return task_result;
-            }
-            if (chars.Count > 0 && !string.IsNullOrEmpty(charName))
-            {
-                string useName = Utilities.GetIdByNameOrNumber(chars, charName);
-                var attr = chars.FirstOrDefault(c => c.Name.Equals(useName));
-                if (attr != null && attr.characteristic != null)
+                if (chars.Count > 0 && !string.IsNullOrEmpty(charName))
                 {
-                    // Read characteristic value
-                    GattReadResult result = await attr.characteristic.ReadValueAsync(BluetoothCacheMode.Uncached);
-
-                    if (result.Status == GattCommunicationStatus.Success)
+                    string useName = Utilities.GetIdByNameOrNumber(chars, charName);
+                    var attr = chars.FirstOrDefault(c => c.Name.Equals(useName));
+                    if (attr != null && attr.characteristic != null)
                     {
-                        Console.WriteLine(Utilities.FormatValue(result.Value, _dataFormat));
-                        _resultCharacteristic = Utilities.FormatValue(result.Value, _dataFormat);
-                        task_result = ERROR_CODE.NONE;
+                        // Read characteristic value
+                        GattReadResult result = await attr.characteristic.ReadValueAsync(BluetoothCacheMode.Uncached);
+
+                        if (result.Status == GattCommunicationStatus.Success)
+                        {
+                            Console.WriteLine(Utilities.FormatValue(result.Value, _dataFormat));
+                            _resultCharacteristic = Utilities.FormatValue(result.Value, _dataFormat);
+                            task_result = ERROR_CODE.NONE;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Read failed: {result.Status}");
+                            task_result = ERROR_CODE.READ_FAIL;
+                        }
                     }
                     else
                     {
-                        Console.WriteLine($"Read failed: {result.Status}");
-                        task_result = ERROR_CODE.READ_FAIL;
+                        Console.WriteLine($"Invalid characteristic {charName}");
+                        task_result = ERROR_CODE.READ_INVALID_CHARACTERISTIC;
                     }
+
                 }
-                else
-                {
-                    Console.WriteLine($"Invalid characteristic {charName}");
-                    task_result = ERROR_CODE.READ_INVALID_CHARACTERISTIC;
-                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"READ_EXCEPTION_1. Can't read characteristics: {ex.Message}");
+                task_result = ERROR_CODE.READ_EXCEPTION_1;
             }
             return task_result;
         }
@@ -351,7 +334,6 @@ namespace VCZ1_TOOL
             var devs = _deviceList.OrderBy(d => d.Name).Where(d => !string.IsNullOrEmpty(d.Name)).ToList();
             string foundId = Utilities.GetIdByNameOrNumber(devs, deviceName);
 
-            _selectedCharacteristic = null;
             _selectedService = null;
             _services.Clear();
 
@@ -603,7 +585,6 @@ namespace VCZ1_TOOL
             var devs = _deviceList.OrderBy(d => d.Name).Where(d => !string.IsNullOrEmpty(d.Name)).ToList();
             string foundId = Utilities.GetIdByNameOrNumber(devs, deviceName);
 
-            _selectedCharacteristic = null;
             _selectedService = null;
             _services.Clear();
 
@@ -711,7 +692,7 @@ namespace VCZ1_TOOL
             {
                 task_result = ERROR_CODE.OPENDEVICE_UNREACHABLE;
             }
-            _selectedCharacteristic = null;
+
             _selectedService = null;
             _services.Clear();
 
