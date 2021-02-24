@@ -345,72 +345,67 @@ namespace VCZ1_TOOL
                     // 온도
                     string characteristic_name = "EnvironmentalSensing/Temperature";
                     string dev_name = "VC Z1 " + gOp.SN[index].Substring(gOp.SN[index].Length - 4);
-                    string[] srVals = { "0", "0", "0" };
+                    string[] srVals = { "0", "0", "0", "0" };
                     string srData;
 
-                    ERROR_CODE error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
-                    if ((error_code == ERROR_CODE.BLE_NO_CONNECTED) || (error_code != ERROR_CODE.NONE))
+                    srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
+                    if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
                         continue;
                     }
 
-                    srData = ble[index].getCharacteristic();
                     srVals = srData.Split(' ');
-                    values[0] = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    values[0] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     values[0] = values[0] / 100.0;
                     listDebug.Items.Insert(0, gOp.SN[index] + "(온도):" + ble[index].getCharacteristic() + "==>" + values[0].ToString());
 
                     // 습도
                     characteristic_name = "EnvironmentalSensing/Humidity";
-                    error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
-                    if ((error_code == ERROR_CODE.BLE_NO_CONNECTED) || (error_code != ERROR_CODE.NONE))
+                    srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
+                    if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
                         continue;
                     }
 
-                    srData = ble[index].getCharacteristic();
                     srVals = srData.Split(' ');
-                    values[1] = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                    values[1] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     values[1] = values[1] / 100.0;
                     listDebug.Items.Insert(0, gOp.SN[index] + "(습도):" + ble[index].getCharacteristic() + "==>" + values[1].ToString());
 
                     // TVOC
                     characteristic_name = "EnvironmentalSensing/TVOC";
-                    error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
-                    if ((error_code == ERROR_CODE.BLE_NO_CONNECTED) || (error_code != ERROR_CODE.NONE))
+                    srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
+                    if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
                         continue;
                     }
 
-                    srData = ble[index].getCharacteristic();
                     srVals = srData.Split(' ');
-                    values[2] = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
-                    values[2] = values[2] / 100.0;
+                    values[2] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     listDebug.Items.Insert(0, gOp.SN[index] + "(TVOC):" + ble[index].getCharacteristic() + "==>" + values[2].ToString());
 
                     // FANSPEED
                     characteristic_name = "VCService/FanSpeed";
-                    error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
-                    if ((error_code == ERROR_CODE.BLE_NO_CONNECTED) || (error_code != ERROR_CODE.NONE))
+                    srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
+                    if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
                         continue;
                     }
-                    srData = ble[index].getCharacteristic();
+                    
                     srVals = srData.Split(' ');
-                    values[3] = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
-                    values[3] = values[3] / 100.0;
+                    values[3] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     listDebug.Items.Insert(0, gOp.SN[index] + "(FANS):" + ble[index].getCharacteristic() + "==>" + values[3].ToString());
 
                     // BATTERY
                     characteristic_name = "Battery/BatteryLevel";
-                    error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
-                    if ((error_code == ERROR_CODE.BLE_NO_CONNECTED) || (error_code != ERROR_CODE.NONE))
+                    srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
+                    if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
                         continue;
                     }
-                    srData = ble[index].getCharacteristic();
+                    
                     srVals = srData.Split(' ');
-                    values[4] = int.Parse(srVals[0]);
+                    values[4] = int.Parse(srVals[1]);
                     listDebug.Items.Insert(0, gOp.SN[index] + "(BATT):" + ble[index].getCharacteristic() + "==>" + values[4].ToString());
                 } catch (Exception error)
                 {

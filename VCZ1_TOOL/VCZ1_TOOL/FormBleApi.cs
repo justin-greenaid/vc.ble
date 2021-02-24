@@ -124,6 +124,7 @@ namespace VCZ1_TOOL
 
         private async Task<int> Z1_GET_DATA(int index, double[] values)
         {
+#if _BLOCKED_BY_JUSTIN_
             //--- check if SN is connected
             if (Z1_GetDeviceConnectionStatus(index, "VC Z1 " + gOp.SN[index].Substring(gOp.SN[index].Length - 4)) == ERROR_CODE.BLE_NO_CONNECTED)
             {
@@ -272,6 +273,8 @@ namespace VCZ1_TOOL
             }
 
             listDebug.Items.Insert(0, index.ToString() + " : Z1_GET_DATA_All data read");
+#endif // _BLOCKED_BY_JUSTIN_
+
             return read_complete;
         }
     }
