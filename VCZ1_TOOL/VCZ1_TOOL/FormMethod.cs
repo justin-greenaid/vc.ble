@@ -369,7 +369,7 @@ namespace VCZ1_TOOL
                     {
                         dtCurTime = DateTime.Now;
                         iElapsedTime = (dtCurTime.Ticks - dtStartTime.Ticks) / 10000000;
-                        if (iElapsedTime >= 60)
+                        if (iElapsedTime >= 120)
                             pMain.Set_Connection_Status(index, false);
                         continue;
                     }
@@ -643,8 +643,8 @@ namespace VCZ1_TOOL
             }
             else
             {
-                dgvForm.Rows[index].Cells[8].Style.BackColor = NORMALCOLOR;
-                dgvForm.Rows[index].Cells[8].Value = "PASS";
+                dgvForm.Rows[index].Cells[9].Style.BackColor = NORMALCOLOR;
+                dgvForm.Rows[index].Cells[9].Value = "PASS";
                 iFail[5] = 0;
             }
 

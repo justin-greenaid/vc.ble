@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dgvForm = new System.Windows.Forms.DataGridView();
             this.NO = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SN = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -89,14 +89,14 @@
             this.dgvForm.BackgroundColor = System.Drawing.Color.DarkGray;
             this.dgvForm.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dgvForm.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("맑은 고딕", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgvForm.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("맑은 고딕", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvForm.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.dgvForm.ColumnHeadersHeight = 70;
             this.dgvForm.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.dgvForm.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -118,8 +118,8 @@
             this.dgvForm.RowHeadersVisible = false;
             this.dgvForm.RowHeadersWidth = 15;
             this.dgvForm.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgvForm.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvForm.RowsDefaultCellStyle = dataGridViewCellStyle5;
             this.dgvForm.RowTemplate.Height = 40;
             this.dgvForm.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.dgvForm.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
@@ -270,8 +270,8 @@
             this.dgvStd.MultiSelect = false;
             this.dgvStd.Name = "dgvStd";
             this.dgvStd.RowHeadersVisible = false;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgvStd.RowsDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvStd.RowsDefaultCellStyle = dataGridViewCellStyle6;
             this.dgvStd.RowTemplate.Height = 40;
             this.dgvStd.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.dgvStd.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
@@ -464,11 +464,11 @@
             // LMessage2
             // 
             this.LMessage2.AutoSize = true;
-            this.LMessage2.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LMessage2.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.LMessage2.Location = new System.Drawing.Point(1050, 608);
             this.LMessage2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.LMessage2.Name = "LMessage2";
-            this.LMessage2.Size = new System.Drawing.Size(17, 21);
+            this.LMessage2.Size = new System.Drawing.Size(9, 11);
             this.LMessage2.TabIndex = 13;
             this.LMessage2.Text = "-";
             // 
