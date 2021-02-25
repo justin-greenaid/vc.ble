@@ -395,7 +395,7 @@ namespace VCZ1_TOOL
                     srVals = srData.Split(' ');
                     values[0] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     values[0] = values[0] / 100.0;
-                    listDebug.Items.Insert(0, gOp.SN[index] + "(온도):" + ble[index].getCharacteristic() + "==>" + values[0].ToString());
+                    listDebug.Items.Insert(0, gOp.SN[index] + "(온도):" + srVals[1] + " "+ srVals[2] + "==>" + values[0].ToString());
 
                     // 습도
                     characteristic_name = "EnvironmentalSensing/Humidity";
@@ -409,7 +409,7 @@ namespace VCZ1_TOOL
                     srVals = srData.Split(' ');
                     values[1] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     values[1] = values[1] / 100.0;
-                    listDebug.Items.Insert(0, gOp.SN[index] + "(습도):" + ble[index].getCharacteristic() + "==>" + values[1].ToString());
+                    listDebug.Items.Insert(0, gOp.SN[index] + "(습도):" + srVals[1] + " " + srVals[2] + "==>" + values[1].ToString());
 
                     // TVOC
                     characteristic_name = "EnvironmentalSensing/TVOC";
@@ -422,7 +422,7 @@ namespace VCZ1_TOOL
 
                     srVals = srData.Split(' ');
                     values[2] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
-                    listDebug.Items.Insert(0, gOp.SN[index] + "(TVOC):" + ble[index].getCharacteristic() + "==>" + values[2].ToString());
+                    listDebug.Items.Insert(0, gOp.SN[index] + "(TVOC):" + srVals[1] + " " + srVals[2] + "==>" + values[2].ToString());
 
                     // FANSPEED
                     characteristic_name = "VCService/FanSpeed";
@@ -435,7 +435,7 @@ namespace VCZ1_TOOL
                     
                     srVals = srData.Split(' ');
                     values[3] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
-                    listDebug.Items.Insert(0, gOp.SN[index] + "(FANS):" + ble[index].getCharacteristic() + "==>" + values[3].ToString());
+                    listDebug.Items.Insert(0, gOp.SN[index] + "(FANS):" + srVals[1] + " " + srVals[2] + "==>" + values[3].ToString());
 
                     // CO2
                     characteristic_name = "EnvironmentalSensing/Co2";
