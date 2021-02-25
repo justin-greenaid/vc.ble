@@ -212,7 +212,7 @@ namespace VCZ1_TOOL
                 srData = ble[index].getCharacteristic();
                 srVals = srData.Split(' ');
                 values[2] = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
-                values[2] = values[2] / 100.0;
+                values[2] = values[2];
                 listDebug.Items.Insert(0, gOp.SN[index] + "(TVOC):" + ble[index].getCharacteristic() + "==>" + values[2].ToString());
                 Set_Connection_Status(index, true);
             }
@@ -249,6 +249,31 @@ namespace VCZ1_TOOL
                 return read_complete;
             }
 
+            // CO2
+            characteristic_name = "EnvironmentalSensing/Humidity";
+            //listDebug.Items.Insert(0, $"set {characteristic_name}");
+            error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
+            if (error_code == ERROR_CODE.NONE)
+            {
+                //listDebug.Items.Insert(0, $"{characteristic_name}: {ble.getCharacteristic()}");
+                srData = ble[index].getCharacteristic();
+                srVals = srData.Split(' ');
+                values[4] = int.Parse(srVals[1]) * 256 + int.Parse(srVals[0]);
+                values[4] = values[1] / 100.0;
+                listDebug.Items.Insert(0, gOp.SN[index] + "(습도):" + ble[index].getCharacteristic() + "==>" + values[4].ToString());
+
+                Set_Connection_Status(index, true);
+            }
+            else
+            {
+                Task<int> ret = Z1_PAIR_SN(index, gOp.SN[index]);
+                int result = await ret;
+                listDebug.Items.Insert(0, index.ToString() + " ### ERROR: CO2");
+                read_complete = -2;
+                Set_Connection_Status(index, false);
+                return read_complete;
+            }
+
             // BATTERY
             characteristic_name = "Battery/BatteryLevel";
             //listDebug.Items.Insert(0, $"set {characteristic_name}");
@@ -258,8 +283,8 @@ namespace VCZ1_TOOL
                 //listDebug.Items.Insert(0, $"{characteristic_name}: {ble.getCharacteristic()}");
                 srData = ble[index].getCharacteristic();
                 srVals = srData.Split(' ');
-                values[4] = int.Parse(srVals[0]);
-                listDebug.Items.Insert(0, gOp.SN[index] + "(BATT):" + ble[index].getCharacteristic() + "==>" + values[4].ToString());
+                values[5] = int.Parse(srVals[0]);
+                listDebug.Items.Insert(0, gOp.SN[index] + "(BATT):" + ble[index].getCharacteristic() + "==>" + values[5].ToString());
                 Set_Connection_Status(index, true);
             }
             else

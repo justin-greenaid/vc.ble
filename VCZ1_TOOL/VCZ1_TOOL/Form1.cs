@@ -16,7 +16,9 @@ namespace VCZ1_TOOL
 
     public partial class FormZ1 : Form
     {
-        const int MAX_NUM_SN = 30;
+        const int MAX_NUM_SN = 10;
+        const int CELL_HEIGHT = 60;
+        const int CELL_HEIGHT_STD = 45;
 
         public struct Z1_Config
         {
@@ -24,6 +26,7 @@ namespace VCZ1_TOOL
             public double[] humi;
             public double[] tvoc;
             public double[] fans;
+            public double[] co2;
             public int duration;
             public int read_freq;
             public int log_method;  // 0: avg, 1:all
@@ -96,16 +99,16 @@ namespace VCZ1_TOOL
         Thread[] gThread = new Thread[MAX_NUM_SN];
         Z1_Config gCfg;
         Z1_Operation gOp;
-        Z1_MeasureStat[,] gMeasure = new Z1_MeasureStat[MAX_NUM_SN, 5];  // temp, humi, tvoc, fans, battery      
+        Z1_MeasureStat[,] gMeasure = new Z1_MeasureStat[MAX_NUM_SN, 6];  // temp, humi, tvoc, fans, battery, co2     
         string strCheckFolder = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\'));
         int numDoubleClick = 0;
-        double[] z1_values = new double[5];
+        double[] z1_values = new double[6]; // 0:온도, 1:습도, 2:TVOC, 3:FANSPEED, 4:CO2, 5:BATTERY
         int read_complete = 0;
         Bleservice[] ble = new Bleservice[MAX_NUM_SN];
 
         Color UPCOLOR = Color.FromArgb(0, 128, 255);
         Color DOWNCOLOR = Color.FromArgb(0, 64, 128);
-        Color WARNCOLOR = Color.FromArgb(255, 255, 0);
+        Color WARNCOLOR = Color.FromArgb(255, 0, 0);
         Color NORMALCOLOR = Color.FromArgb(128, 192, 255);
         Color FAILCOLOR = Color.FromArgb(255, 0, 0);
         Color PASSCOLOR = Color.FromArgb(0, 192, 255);
@@ -204,7 +207,7 @@ namespace VCZ1_TOOL
             }
 
             //--- Averaging
-            for (int k = 0; k < 5; k++)
+            for (int k = 0; k < 6; k++)
             {
                 gMeasure[gOp.curIndex,k].sum += z1_values[k];
                 gMeasure[gOp.curIndex, k].avg = gMeasure[gOp.curIndex, k].sum / gOp.numRead[gOp.curIndex];
@@ -220,6 +223,7 @@ namespace VCZ1_TOOL
             dgvForm.Rows[gOp.curIndex].Cells[5].Value = ((int)(gMeasure[gOp.curIndex, 2].avg * 10)) / 10.0;
             dgvForm.Rows[gOp.curIndex].Cells[6].Value = ((int)(gMeasure[gOp.curIndex, 3].avg * 10)) / 10.0;
             dgvForm.Rows[gOp.curIndex].Cells[7].Value = ((int)(gMeasure[gOp.curIndex, 4].avg * 10)) / 10.0;
+            dgvForm.Rows[gOp.curIndex].Cells[8].Value = ((int)(gMeasure[gOp.curIndex, 5].avg * 10)) / 10.0;
 
             if (gMeasure[gOp.curIndex, 0].avg > gCfg.temp[1] || gMeasure[gOp.curIndex, 0].avg < gCfg.temp[2])
                 dgvForm.Rows[gOp.curIndex].Cells[3].Style.BackColor = WARNCOLOR;
@@ -241,7 +245,12 @@ namespace VCZ1_TOOL
             else
                 dgvForm.Rows[gOp.curIndex].Cells[6].Style.BackColor = NORMALCOLOR;
 
-            dgvForm.Rows[gOp.curIndex].Cells[7].Style.BackColor = NORMALCOLOR;
+            if (gMeasure[gOp.curIndex, 4].avg > gCfg.co2[1] || gMeasure[gOp.curIndex, 4].avg < gCfg.co2[2])
+                dgvForm.Rows[gOp.curIndex].Cells[7].Style.BackColor = WARNCOLOR;
+            else
+                dgvForm.Rows[gOp.curIndex].Cells[7].Style.BackColor = NORMALCOLOR;
+
+            dgvForm.Rows[gOp.curIndex].Cells[8].Style.BackColor = NORMALCOLOR;
 
             //--- Logging
             if (gCfg.log_method == 1)   // all
@@ -262,8 +271,8 @@ namespace VCZ1_TOOL
                 return;
             }
 
-            //--- Display Elapsed Time, GetValues(0:temp, 1:humi, 2:tvoc, 3:fans, 4:battery)
-            string strValue = string.Format("현재값({0},{1}): {2},  {3},  {4},  {5},  {6}", gOp.curIndex, gOp.SN[gOp.curIndex],z1_values[0], z1_values[1], z1_values[2], z1_values[3], z1_values[4]);
+            //--- Display Elapsed Time, GetValues(0:temp, 1:humi, 2:tvoc, 3:fans, 4:co2, 5:battery)
+            string strValue = string.Format("현재값({0},{1}): {2},  {3},  {4},  {5},  {6}", gOp.curIndex, gOp.SN[gOp.curIndex],z1_values[0], z1_values[1], z1_values[2], z1_values[3], z1_values[4], z1_values[5]);
             LMessage2.Text = strValue;
             if (gOp.mode == 2)
                 timerPolling.Enabled = true;
@@ -302,6 +311,11 @@ namespace VCZ1_TOOL
             {
                 Btn_Action.BackColor = OFFCOLOR;
             }
+        }
+
+        private void dgvStd_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
 
     }

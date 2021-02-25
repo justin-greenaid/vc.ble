@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace VCZ1_TOOL
 {
@@ -154,7 +155,8 @@ namespace VCZ1_TOOL
                     gCfg.temp[i-1] = double.Parse(dgvStd.Rows[0].Cells[i].Value.ToString());
                     gCfg.humi[i-1] = double.Parse(dgvStd.Rows[1].Cells[i].Value.ToString());
                     gCfg.tvoc[i-1] = double.Parse(dgvStd.Rows[2].Cells[i].Value.ToString());
-                    gCfg.fans[i-1] = double.Parse(dgvStd.Rows[3].Cells[i].Value.ToString());
+                    gCfg.fans[i - 1] = double.Parse(dgvStd.Rows[3].Cells[i].Value.ToString());
+                    gCfg.co2[i - 1] = double.Parse(dgvStd.Rows[4].Cells[i].Value.ToString());
                 }
                 gCfg.duration = int.Parse(textBox3.Text.ToString());
                 //--- set focus to BARCODE
@@ -228,11 +230,78 @@ namespace VCZ1_TOOL
                 }
             }
 
-            gOp.SN[e.RowIndex] = dgvForm.Rows[e.RowIndex].Cells[1].Value.ToString();
-            if (e.RowIndex >= gOp.numSN)
-                gOp.numSN++;
+            if (dgvForm.Rows[e.RowIndex].Cells[1].Value != null)
+            {
+                gOp.SN[e.RowIndex] = dgvForm.Rows[e.RowIndex].Cells[1].Value.ToString();
+                if (e.RowIndex >= gOp.numSN)
+                    gOp.numSN++;
+            }
 
             this.timer100.Enabled = true;
+        }
+
+        private void Btn_SNLoad_Click(object sender, EventArgs e)
+        {
+            int iReadNO = 0;
+            string line;
+
+            //---- read SN from File
+
+
+            if (File.Exists(strCheckFolder + "\\snlist.txt") == false)
+            {
+                Warning_Message("No snllist.txt file");
+                return;
+            }
+
+            // ClearList
+            ClearGridValuesExceptSN();
+
+            // ReadFrom snlist.txt
+            // Read the file and display it line by line.  
+            System.IO.StreamReader file = new System.IO.StreamReader(strCheckFolder + "\\snlist.txt");
+            while ((line = file.ReadLine()) != null)
+            {
+                dgvForm.Rows[iReadNO].Cells[1].Value = line;
+                gOp.SN[iReadNO] = line;
+                iReadNO++;
+
+                if (iReadNO >= MAX_NUM_SN)
+                    break;
+            }
+            file.Close();
+        }
+
+        private void dgvForm_ColumnHeaderMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            int iReadNO = 0;
+            string line;
+
+            //---- read SN from File
+
+
+            if (File.Exists(strCheckFolder + "\\snlist.txt") == false)
+            {
+                Warning_Message("No snllist.txt file");
+                return;
+            }
+
+            // ClearList
+            ClearGridValuesExceptSN();
+
+            // ReadFrom snlist.txt
+            // Read the file and display it line by line.  
+            System.IO.StreamReader file = new System.IO.StreamReader(strCheckFolder + "\\snlist.txt");
+            while ((line = file.ReadLine()) != null)
+            {
+                dgvForm.Rows[iReadNO].Cells[1].Value = line;
+                gOp.SN[iReadNO] = line;
+                iReadNO++;
+
+                if (iReadNO >= MAX_NUM_SN)
+                    break;
+            }
+            file.Close();
         }
 
     }

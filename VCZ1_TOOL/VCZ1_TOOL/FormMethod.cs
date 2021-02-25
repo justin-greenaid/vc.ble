@@ -25,6 +25,7 @@ namespace VCZ1_TOOL
             gCfg.humi = new double[3];
             gCfg.tvoc = new double[3];
             gCfg.fans = new double[3];
+            gCfg.co2 = new double[3];
 
             // read configuration
             string strRet;
@@ -53,6 +54,11 @@ namespace VCZ1_TOOL
                 for (i = 0; i < 3; i++)
                     gCfg.fans[i] = double.Parse(srVals[i]);
 
+                strRet = inif.Read("Configuration", "co2");
+                srVals = strRet.Split(',');
+                for (i = 0; i < 3; i++)
+                    gCfg.co2[i] = double.Parse(srVals[i]);
+
                 gCfg.duration = int.Parse(inif.Read("Configuration", "duration"));
                 gCfg.read_freq = int.Parse(inif.Read("Configuration", "read_freq"));
                 gCfg.log_method = int.Parse(inif.Read("Configuration", "log_method"));
@@ -76,6 +82,7 @@ namespace VCZ1_TOOL
                     gCfg.humi[i] = value;
                     gCfg.tvoc[i] = value;
                     gCfg.fans[i] = value;
+                    gCfg.co2[i] = value;
                 }
 
                 gCfg.duration = 5;
@@ -104,6 +111,9 @@ namespace VCZ1_TOOL
 
             strData = string.Format("{0},{1},{2}", gCfg.fans[0], gCfg.fans[1], gCfg.fans[2]);
             inif.Write("Configuration", "fan_speed", strData);
+
+            strData = string.Format("{0},{1},{2}", gCfg.co2[0], gCfg.co2[1], gCfg.co2[2]);
+            inif.Write("Configuration", "co2", strData);
 
             strData = string.Format("{0}", gCfg.duration);
             inif.Write("Configuration", "duration", strData);
@@ -142,7 +152,7 @@ namespace VCZ1_TOOL
             {
                 row[0] = Convert.ToString(n + 1);
                 dgvForm.Rows.Add(row);
-                dgvForm.Rows[n].Height = 30;
+                dgvForm.Rows[n].Height = CELL_HEIGHT;
                 dgvForm.Rows[n].Cells[1].Style.BackColor = Color.White;
             }
 
@@ -176,18 +186,20 @@ namespace VCZ1_TOOL
             //dgvStd.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
             //dgvStd.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
             string stdtype;
-            stdtype = "온도" + "\r\n" + "(°C)";
+            stdtype = "온도" + "(°C)";
             dgvStd.Rows.Add(stdtype);
-            stdtype = "습도" + "\r\n" + "(%)";
+            stdtype = "습도" + "(%)";
             dgvStd.Rows.Add(stdtype);
-            stdtype = "TVOC" + "\r\n" + "(ppm)";
+            stdtype = "TVOC" + "(ppm)";
             dgvStd.Rows.Add(stdtype);
-            stdtype = "FAN Speed" + "\r\n" + "(RPM)";
+            stdtype = "FAN속도" + "(rpm)";
+            dgvStd.Rows.Add(stdtype);
+            stdtype = "CO2" + "(ppm)";
             dgvStd.Rows.Add(stdtype);
 
-            for (int n = 0; n < 4; n++)
+            for (int n = 0; n < 5; n++)
             {
-                dgvStd.Rows[n].Height = 36;
+                dgvStd.Rows[n].Height = CELL_HEIGHT_STD;
             }
 
             for (int k = 1; k <= 3; k++)
@@ -198,14 +210,16 @@ namespace VCZ1_TOOL
                 dgvStd.Rows[2].Cells[k].Value = gCfg.tvoc[k - 1];
             for (int k = 1; k <= 3; k++)
                 dgvStd.Rows[3].Cells[k].Value = gCfg.fans[k - 1];
+            for (int k = 1; k <= 3; k++)
+                dgvStd.Rows[4].Cells[k].Value = gCfg.co2[k - 1];
 
             //--------------------------------------------------------------------
             //--- text box
             textBox2.AutoSize = false;
-            textBox2.Height = 28;
+            textBox2.Height = 40;
             textBox2.BackColor = HEADERCOLOR;
             textBox3.AutoSize = false;
-            textBox3.Height = 28;
+            textBox3.Height = 40;
             textBox3.Text = gCfg.duration.ToString();
 
             //--- log method
@@ -219,7 +233,7 @@ namespace VCZ1_TOOL
             this.dgvStd.DefaultCellStyle.SelectionBackColor = this.dgvStd.DefaultCellStyle.BackColor;
             this.dgvStd.DefaultCellStyle.SelectionForeColor = this.dgvStd.DefaultCellStyle.ForeColor;
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
                 dgvStd.Rows[i].Cells[0].Style.BackColor = HEADERCOLOR;
             dgvStd.Rows[0].Cells[1].Selected = true;
 
@@ -231,6 +245,20 @@ namespace VCZ1_TOOL
 
         }
 
+        private void ClearGridValuesExceptSN()
+        {
+            //--- Clear Cell Values
+            for (int i = 0; i < MAX_NUM_SN; i++)
+            {
+                for (int k = 2; k <= 9; k++)
+                {
+                    dgvForm.Rows[i].Cells[k].Value = "";
+                    dgvForm.Rows[i].Cells[k].Style.BackColor = DISABLEDCOLOR;
+                }
+            }
+
+        }
+
         private async void Start_Measure()
         {
             //--- initialize operation variables
@@ -238,9 +266,11 @@ namespace VCZ1_TOOL
             gOp.mode = 2;   // measuring
             Button_Enable(gOp.mode);
 
+            ClearGridValuesExceptSN();
+
             //--- initialize statistics values
             for (int i = 0; i < MAX_NUM_SN; i++)
-                for (int k = 0; k < 5; k++)
+                for (int k = 0; k < 6; k++)
                     gMeasure[i, k].Reset();
 
             //--- connect 
@@ -318,7 +348,10 @@ namespace VCZ1_TOOL
         public async void DataReading(int index, FormZ1 myclass)
         {
             FormZ1 pMain = (FormZ1)myclass;
-            double[] values = new double[5];
+            double[] values = new double[6];
+            long iElapsedTime = 0;
+            DateTimeOffset dtStartTime = DateTime.Now;
+            DateTimeOffset dtCurTime = DateTime.Now;
 
             while (pMain.gOp.ValidDevice[index] == 1)
             {
@@ -334,10 +367,14 @@ namespace VCZ1_TOOL
                     result = await pMain.BleConnect(index, device_name);
                     if ((result != ERROR_CODE.NONE))
                     {
-                        pMain.Set_Connection_Status(index, false);
+                        dtCurTime = DateTime.Now;
+                        iElapsedTime = (dtCurTime.Ticks - dtStartTime.Ticks) / 10000000;
+                        if (iElapsedTime >= 60)
+                            pMain.Set_Connection_Status(index, false);
                         continue;
                     }
                     pMain.Set_Connection_Status(index, true);
+                    dtStartTime = DateTime.Now;
                 }
 
                 try
@@ -345,12 +382,13 @@ namespace VCZ1_TOOL
                     // 온도
                     string characteristic_name = "EnvironmentalSensing/Temperature";
                     string dev_name = "VC Z1 " + gOp.SN[index].Substring(gOp.SN[index].Length - 4);
-                    string[] srVals = { "0", "0", "0", "0" };
+                    string[] srVals = { "0", "0", "0", "0", "0" };
                     string srData;
 
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
                     if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
+                        listDebug.Items.Insert(0, "### " + gOp.SN[index] + "(온도):" + "Read Error");
                         continue;
                     }
 
@@ -364,6 +402,7 @@ namespace VCZ1_TOOL
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
                     if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
+                        listDebug.Items.Insert(0, "### " + gOp.SN[index] + "(습도):" + "Read Error");
                         continue;
                     }
 
@@ -377,6 +416,7 @@ namespace VCZ1_TOOL
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
                     if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
+                        listDebug.Items.Insert(0, "### " + gOp.SN[index] + "(TVOC):" + "Read Error");
                         continue;
                     }
 
@@ -389,6 +429,7 @@ namespace VCZ1_TOOL
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
                     if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
+                        listDebug.Items.Insert(0, "### " + gOp.SN[index] + "(FAN속도):" + "Read Error");
                         continue;
                     }
                     
@@ -396,18 +437,33 @@ namespace VCZ1_TOOL
                     values[3] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     listDebug.Items.Insert(0, gOp.SN[index] + "(FANS):" + ble[index].getCharacteristic() + "==>" + values[3].ToString());
 
+                    // CO2
+                    characteristic_name = "EnvironmentalSensing/Co2";
+                    srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
+                    if (!srData.StartsWith("ERROR_CODE.NONE"))
+                    {
+                        listDebug.Items.Insert(0, "### " + gOp.SN[index] + "(CO2):" + "Read Error");
+                        continue;
+                    }
+
+                    srVals = srData.Split(' ');
+                    values[4] = int.Parse(srVals[4]) * 16777215 + int.Parse(srVals[3]) * 655536 + int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
+                    listDebug.Items.Insert(0, gOp.SN[index] + "(CO2):" + ble[index].getCharacteristic() + "==>" + values[4].ToString());
+
                     // BATTERY
                     characteristic_name = "Battery/BatteryLevel";
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
                     if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
+                        listDebug.Items.Insert(0, "### " + gOp.SN[index] + "(BATTERY):" + "Read Error");
                         continue;
                     }
                     
                     srVals = srData.Split(' ');
-                    values[4] = int.Parse(srVals[1]);
+                    values[5] = int.Parse(srVals[1]);
                     listDebug.Items.Insert(0, gOp.SN[index] + "(BATT):" + ble[index].getCharacteristic() + "==>" + values[4].ToString());
-                } catch (Exception error)
+                }
+                catch (Exception error)
                 {
                     Warning_Message("Read Exception Occurred!");
                     listDebug.Items.Insert(0, gOp.SN[index] + "ERROR OCCURRED");
@@ -438,7 +494,7 @@ namespace VCZ1_TOOL
             gOp.numRead[index]++;
 
             //--- Averaging
-            for (int k = 0; k < 5; k++)
+            for (int k = 0; k < 6; k++)
             {
                 gMeasure[index, k].sum += values[k];
                 gMeasure[index, k].avg = gMeasure[index, k].sum / gOp.numRead[index];
@@ -454,6 +510,7 @@ namespace VCZ1_TOOL
             dgvForm.Rows[index].Cells[5].Value = ((int)(gMeasure[index, 2].avg * 10)) / 10.0;
             dgvForm.Rows[index].Cells[6].Value = ((int)(gMeasure[index, 3].avg * 10)) / 10.0;
             dgvForm.Rows[index].Cells[7].Value = ((int)(gMeasure[index, 4].avg * 10)) / 10.0;
+            dgvForm.Rows[index].Cells[8].Value = ((int)(gMeasure[index, 5].avg * 10)) / 10.0;
 
             if (gMeasure[index, 0].avg > gCfg.temp[1] || gMeasure[index, 0].avg < gCfg.temp[2])
                 dgvForm.Rows[index].Cells[3].Style.BackColor = WARNCOLOR;
@@ -475,20 +532,25 @@ namespace VCZ1_TOOL
             else
                 dgvForm.Rows[index].Cells[6].Style.BackColor = NORMALCOLOR;
 
-            dgvForm.Rows[index].Cells[7].Style.BackColor = NORMALCOLOR;
+            if (gMeasure[index, 4].avg > gCfg.co2[1] || gMeasure[index, 4].avg < gCfg.co2[2])
+                dgvForm.Rows[index].Cells[7].Style.BackColor = WARNCOLOR;
+            else
+                dgvForm.Rows[index].Cells[7].Style.BackColor = NORMALCOLOR;
+
+            dgvForm.Rows[index].Cells[8].Style.BackColor = NORMALCOLOR;
 
             //--- Logging
             if (gCfg.log_method == 1)   // all
             {
                 string strDate = dateNow.ToString("yyyyMMdd_hhmmss");
                 string strfile = string.Format("{0}\\{1}_{2}.csv", gCfg.log_dir, gOp.SN[index], gOp.strLogDate);
-                string str = string.Format("{0}, {1}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}, {6:0.0}\r\n",
-                                    strDate, gOp.SN[index], values[0], values[1], values[2], values[3], values[4]);
+                string str = string.Format("{0}, {1}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}, {6:0.0}, {7:0.0}\r\n",
+                                    strDate, gOp.SN[index], values[0], values[1], values[2], values[3], values[4], values[5]);
                 System.IO.File.AppendAllText(strfile, str, Encoding.Default);
             }
 
-            //--- Display Elapsed Time, GetValues(0:temp, 1:humi, 2:tvoc, 3:fans, 4:battery)
-            string strValue = string.Format("현재값({0},{1}) #read={2}: {3},  {4},  {5},  {6},  {7}", index, gOp.SN[index], gOp.numRead[index], values[0], values[1], values[2], values[3], values[4]);
+            //--- Display Elapsed Time, GetValues(0:temp, 1:humi, 2:tvoc, 3:fans, 4:co2, 5:battery)
+            string strValue = string.Format("현재값({0},{1}) #read={2}: <{3},  {4},  {5},  {6},  {7}, {8}>", index, gOp.SN[index], gOp.numRead[index], values[0], values[1], values[2], values[3], values[4], values[5]);
             LMessage2.Text = strValue;
             return;
 
@@ -499,23 +561,23 @@ namespace VCZ1_TOOL
             string[] strResult = { "PASS", "FAIL" };
 
             string strfile = string.Format("{0}\\{1}_{2}.csv", gCfg.log_dir, gOp.SN[index], gOp.strLogDate);
-            string str = string.Format("AVERAGE, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}\r\n",
+            string str = string.Format("AVERAGE, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}, {6:0.0}\r\n",
                         gOp.SN[index], gMeasure[index, 0].avg, gMeasure[index, 1].avg,
-                        gMeasure[index, 2].avg, gMeasure[index, 3].avg, gMeasure[index, 4].avg);
+                        gMeasure[index, 2].avg, gMeasure[index, 3].avg, gMeasure[index, 4].avg, gMeasure[index, 5].avg);
             System.IO.File.AppendAllText(strfile, str, Encoding.Default);
 
-            str = string.Format("MAX, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}\r\n",
+            str = string.Format("MAX, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}, {6:0.0}\r\n",
                         gOp.SN[index], gMeasure[index, 0].max, gMeasure[index, 1].max,
-                        gMeasure[index, 2].max, gMeasure[index, 3].max, gMeasure[index, 4].max);
+                        gMeasure[index, 2].max, gMeasure[index, 3].max, gMeasure[index, 4].max, gMeasure[index, 5].max);
             System.IO.File.AppendAllText(strfile, str, Encoding.Default);
 
-            str = string.Format("MIN, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}\r\n",
+            str = string.Format("MIN, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}, {6:0.0}\r\n",
                         gOp.SN[index], gMeasure[index, 0].min, gMeasure[index, 1].min,
-                        gMeasure[index, 2].min, gMeasure[index, 3].min, gMeasure[index, 4].min);
+                        gMeasure[index, 2].min, gMeasure[index, 3].min, gMeasure[index, 4].min, gMeasure[index, 5].min);
             System.IO.File.AppendAllText(strfile, str, Encoding.Default);
 
             //--- RESULT
-            int[] iFail = new int[5];
+            int[] iFail = new int[6];
             if (gMeasure[index, 0].avg > gCfg.temp[1] || gMeasure[index, 0].avg < gCfg.temp[2])
             {
                 dgvForm.Rows[index].Cells[3].Style.BackColor = WARNCOLOR;
@@ -560,25 +622,36 @@ namespace VCZ1_TOOL
                 iFail[3] = 0;
             }
 
-            dgvForm.Rows[index].Cells[7].Style.BackColor = NORMALCOLOR;
-
-            if (iFail[0] == 1 || iFail[1] == 1 || iFail[2] == 1 || iFail[3] == 1)
+            if (gMeasure[index, 4].avg > gCfg.co2[1] || gMeasure[index, 4].avg < gCfg.co2[2])
             {
-                dgvForm.Rows[index].Cells[8].Style.BackColor = FAILCOLOR;
-                dgvForm.Rows[index].Cells[8].Value = "FAIL";
+                dgvForm.Rows[index].Cells[7].Style.BackColor = WARNCOLOR;
                 iFail[4] = 1;
+            }
+            else
+            {
+                dgvForm.Rows[index].Cells[7].Style.BackColor = NORMALCOLOR;
+                iFail[4] = 0;
+            }
+
+            dgvForm.Rows[index].Cells[8].Style.BackColor = NORMALCOLOR;
+
+            if (iFail[0] == 1 || iFail[1] == 1 || iFail[2] == 1 || iFail[3] == 1 || iFail[4] == 1)
+            {
+                dgvForm.Rows[index].Cells[9].Style.BackColor = FAILCOLOR;
+                dgvForm.Rows[index].Cells[9].Value = "FAIL";
+                iFail[5] = 1;
             }
             else
             {
                 dgvForm.Rows[index].Cells[8].Style.BackColor = NORMALCOLOR;
                 dgvForm.Rows[index].Cells[8].Value = "PASS";
-                iFail[4] = 0;
+                iFail[5] = 0;
             }
 
-            str = string.Format("RESULT, {0}, {1}, {2}, {3}, {4}, , {5}\r\n",
+            str = string.Format("RESULT, {0}, {1}, {2}, {3}, {4}, {5}, , {6}\r\n",
                         gOp.SN[index],
                         strResult[iFail[0]], strResult[iFail[1]],
-                        strResult[iFail[2]], strResult[iFail[3]], strResult[iFail[4]]);
+                        strResult[iFail[2]], strResult[iFail[3]], strResult[iFail[4]], strResult[iFail[5]]);
             System.IO.File.AppendAllText(strfile, str, Encoding.Default);
         }
 
@@ -591,89 +664,6 @@ namespace VCZ1_TOOL
                 if (gOp.SN[i].Length > 0)
                 {
                     Write_AverageMinMax(i);
-                    /*
-                    string strfile = string.Format("{0}\\{1}_{2}.csv", gCfg.log_dir, gOp.SN[i], gOp.strLogDate);
-                    string str = string.Format("AVERAGE, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}\r\n",
-                                gOp.SN[i], gMeasure[i, 0].avg, gMeasure[i, 1].avg,
-                                gMeasure[i, 2].avg, gMeasure[i, 3].avg, gMeasure[i, 4].avg);
-                    System.IO.File.AppendAllText(strfile, str, Encoding.Default);
-
-                    str = string.Format("MAX, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}\r\n",
-                                gOp.SN[i], gMeasure[i, 0].max, gMeasure[i, 1].max,
-                                gMeasure[i, 2].max, gMeasure[i, 3].max, gMeasure[i, 4].max);
-                    System.IO.File.AppendAllText(strfile, str, Encoding.Default);
-
-                    str = string.Format("MIN, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}\r\n",
-                                gOp.SN[i], gMeasure[i, 0].min, gMeasure[i, 1].min,
-                                gMeasure[i, 2].min, gMeasure[i, 3].min, gMeasure[i, 4].min);
-                    System.IO.File.AppendAllText(strfile, str, Encoding.Default);
-
-                    //--- RESULT
-                    int[] iFail = new int [5];
-                    if (gMeasure[i, 0].avg > gCfg.temp[1] || gMeasure[i, 0].avg < gCfg.temp[2])
-                    {
-                        dgvForm.Rows[i].Cells[3].Style.BackColor = WARNCOLOR;
-                        iFail[0] = 1;
-                    }
-                    else
-                    {
-                        dgvForm.Rows[i].Cells[3].Style.BackColor = NORMALCOLOR;
-                        iFail[0] = 0;
-                    }
-
-                    if (gMeasure[i, 1].avg > gCfg.humi[1] || gMeasure[i, 1].avg < gCfg.humi[2])
-                    {
-                        dgvForm.Rows[i].Cells[4].Style.BackColor = WARNCOLOR;
-                        iFail[1] = 1;
-                    }
-                    else
-                    {
-                        dgvForm.Rows[i].Cells[4].Style.BackColor = NORMALCOLOR;
-                        iFail[1] = 0;
-                    }
-
-                    if (gMeasure[i, 2].avg > gCfg.tvoc[1] || gMeasure[i, 2].avg < gCfg.tvoc[2])
-                    {
-                        dgvForm.Rows[i].Cells[5].Style.BackColor = WARNCOLOR;
-                        iFail[2] = 1;
-                    }
-                    else
-                    {
-                        dgvForm.Rows[i].Cells[5].Style.BackColor = NORMALCOLOR;
-                        iFail[2] = 0;
-                    }
-
-                    if (gMeasure[i, 3].avg > gCfg.fans[1] || gMeasure[i, 3].avg < gCfg.fans[2])
-                    {
-                        dgvForm.Rows[i].Cells[6].Style.BackColor = WARNCOLOR;
-                        iFail[3] = 1;
-                    }
-                    else
-                    {
-                        dgvForm.Rows[i].Cells[6].Style.BackColor = NORMALCOLOR;
-                        iFail[3] = 0;
-                    }
-
-                    dgvForm.Rows[i].Cells[7].Style.BackColor = NORMALCOLOR;
-
-                    if (iFail[0] == 1 || iFail[1] == 1 || iFail[2] == 1 || iFail[3] == 1)
-                    {
-                        dgvForm.Rows[i].Cells[8].Style.BackColor = FAILCOLOR;
-                        dgvForm.Rows[i].Cells[8].Value = "FAIL";
-                        iFail[4] = 1;
-                    } else
-                    {
-                        dgvForm.Rows[i].Cells[8].Style.BackColor = NORMALCOLOR;
-                        dgvForm.Rows[i].Cells[8].Value = "PASS";
-                        iFail[4] = 0;
-                    }
-
-                    str = string.Format("RESULT, {0}, {1}, {2}, {3}, {4}, , {5}\r\n",
-                                gOp.SN[i],
-                                strResult[iFail[0]], strResult[iFail[1]],
-                                strResult[iFail[2]], strResult[iFail[3]], strResult[iFail[4]]);
-                    System.IO.File.AppendAllText(strfile, str, Encoding.Default);
-                    */
                 }
             }
 
@@ -815,8 +805,8 @@ namespace VCZ1_TOOL
                     dgvForm.Rows[k].Cells[1].Style.BackColor = DISABLEDCOLOR;
                     if (gOp.ValidDevice[k] == 1)
                         dgvForm.Rows[k].Cells[1].Style.BackColor = DISABLEDCOLOR;
-                    else if (dgvForm.Rows[k].Cells[1].Value != null && dgvForm.Rows[k].Cells[1].Value.ToString().Length > 4)
-                        dgvForm.Rows[k].Cells[1].Style.BackColor = FAILCOLOR;
+                    //else if (dgvForm.Rows[k].Cells[1].Value != null && dgvForm.Rows[k].Cells[1].Value.ToString().Length > 4)
+                    //    dgvForm.Rows[k].Cells[1].Style.BackColor = FAILCOLOR;
                 }
 
                 this.dgvForm.DefaultCellStyle.SelectionBackColor = DISABLEDCOLOR;
