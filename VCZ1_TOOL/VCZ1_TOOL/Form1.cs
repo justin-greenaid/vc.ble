@@ -112,7 +112,7 @@ namespace VCZ1_TOOL
         Color NORMALCOLOR = Color.FromArgb(128, 192, 255);
         Color FAILCOLOR = Color.FromArgb(255, 0, 0);
         Color PASSCOLOR = Color.FromArgb(0, 192, 255);
-        Color PAIRFAIL = Color.FromArgb(50, 210, 90);
+        Color PAIRFAIL = Color.FromArgb(255, 0, 0);
         Color HEADERCOLOR = Color.FromArgb(50, 210, 90);
         Color SELECTCOLOR = Color.FromArgb(100, 192, 255);
         Color DISABLEDCOLOR = Color.LightGray; // Color.FromArgb(20, 148, 255);

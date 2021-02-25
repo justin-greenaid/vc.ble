@@ -369,7 +369,7 @@ namespace VCZ1_TOOL
                     {
                         dtCurTime = DateTime.Now;
                         iElapsedTime = (dtCurTime.Ticks - dtStartTime.Ticks) / 10000000;
-                        if (iElapsedTime >= 60)
+                        if (iElapsedTime >= 120)
                             pMain.Set_Connection_Status(index, false);
                         continue;
                     }

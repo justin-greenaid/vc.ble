@@ -464,11 +464,11 @@
             // LMessage2
             // 
             this.LMessage2.AutoSize = true;
-            this.LMessage2.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LMessage2.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.LMessage2.Location = new System.Drawing.Point(1050, 608);
             this.LMessage2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.LMessage2.Name = "LMessage2";
-            this.LMessage2.Size = new System.Drawing.Size(17, 21);
+            this.LMessage2.Size = new System.Drawing.Size(13, 17);
             this.LMessage2.TabIndex = 13;
             this.LMessage2.Text = "-";
             // 
