@@ -288,7 +288,7 @@ namespace VCZ1_TOOL
                 if (gOp.SN[i].Length >= 4)
                 {
                     string strfile = string.Format("{0}\\{1}_{2}.csv", gCfg.log_dir, gOp.SN[i], gOp.strLogDate);
-                    System.IO.File.WriteAllText(strfile, "DateTime, SN, 온도, 습도, TVOC, FAN속도, 배터리, 결과\r\n", Encoding.Default);
+                    System.IO.File.WriteAllText(strfile, "DateTime, SN, 온도, 습도, TVOC, FAN속도, CO2, 배터리, 결과\r\n", Encoding.Default);
                     gOp.numSN++;
                 }
             }
