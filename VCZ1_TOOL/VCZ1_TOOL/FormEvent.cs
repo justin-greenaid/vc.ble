@@ -31,6 +31,7 @@ namespace VCZ1_TOOL
             // nothing to do
             SetCurrentInputPostion();
         }
+ 
         private void Btn_Action_MouseClick(object sender, MouseEventArgs e)
         {
             if (gOp.mode == 2)
@@ -42,7 +43,7 @@ namespace VCZ1_TOOL
             {
                 for (int k = 0; k < MAX_NUM_SN; k++)
                 {
-                    for (int j = 1; j < 9; j++)
+                    for (int j = 1; j <= 9; j++)
                     {
                         dgvForm.Rows[k].Cells[j].Value = "";
                         if (j == 1)
