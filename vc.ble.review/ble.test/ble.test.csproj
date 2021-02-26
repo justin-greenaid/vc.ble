@@ -53,8 +53,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="bleutility.cs" />
-    <Compile Include="bleservice.cs" />
+    <Compile Include="..\Bleservice\bleservice.cs">
+      <Link>bleservice.cs</Link>
+    </Compile>
+    <Compile Include="..\Bleservice\bleutility.cs">
+      <Link>bleutility.cs</Link>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

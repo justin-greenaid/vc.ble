@@ -12,7 +12,7 @@ using System.Threading;
 
 
 
-namespace ble.test
+namespace Ble.Service
 {
 
     static class Constants

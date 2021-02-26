@@ -11,7 +11,7 @@ using System.Threading;
 using System.Text.RegularExpressions;
 using Windows.Devices.Bluetooth.Advertisement;
 
-namespace ble.multi
+namespace Ble.Service
 {
     public class Bleservice
     {
