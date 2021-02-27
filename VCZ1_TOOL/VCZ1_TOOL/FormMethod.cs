@@ -374,9 +374,8 @@ namespace VCZ1_TOOL
                         continue;
                     }
                     pMain.Set_Connection_Status(index, true);
-                    dtStartTime = DateTime.Now;
                 }
-
+                dtStartTime = DateTime.Now;   
                 try
                 {
                     // 온도
