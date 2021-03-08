@@ -153,13 +153,22 @@ namespace VCZ1_TOOL
                 //--- store standard
                 for (int i = 1; i <= 3; i++)
                 {
-                    gCfg.temp[i-1] = double.Parse(dgvStd.Rows[0].Cells[i].Value.ToString());
-                    gCfg.humi[i-1] = double.Parse(dgvStd.Rows[1].Cells[i].Value.ToString());
-                    gCfg.tvoc[i-1] = double.Parse(dgvStd.Rows[2].Cells[i].Value.ToString());
-                    gCfg.fans[i - 1] = double.Parse(dgvStd.Rows[3].Cells[i].Value.ToString());
-                    gCfg.co2[i - 1] = double.Parse(dgvStd.Rows[4].Cells[i].Value.ToString());
+                    if (dgvStd.Rows[0].Cells[i].Value != null)
+                        gCfg.temp[i-1] = double.Parse(dgvStd.Rows[0].Cells[i].Value.ToString());
+                    if (dgvStd.Rows[1].Cells[i].Value != null)
+                        gCfg.humi[i-1] = double.Parse(dgvStd.Rows[1].Cells[i].Value.ToString());
+                    if (dgvStd.Rows[2].Cells[i].Value != null)
+                        gCfg.tvoc[i-1] = double.Parse(dgvStd.Rows[2].Cells[i].Value.ToString());
+                    if (dgvStd.Rows[3].Cells[i].Value != null)
+                        gCfg.fans[i - 1] = double.Parse(dgvStd.Rows[3].Cells[i].Value.ToString());
+                    if (dgvStd.Rows[4].Cells[i].Value != null)
+                        gCfg.co2[i - 1] = double.Parse(dgvStd.Rows[4].Cells[i].Value.ToString());
                 }
-                gCfg.duration = int.Parse(textBox3.Text.ToString());
+
+                if (textBox3.Text != null)
+                    gCfg.duration = int.Parse(textBox3.Text.ToString());
+                else
+                    gCfg.duration = 5;
                 //--- set focus to BARCODE
                 SetCurrentInputPostion();
 
@@ -219,7 +228,7 @@ namespace VCZ1_TOOL
             for (int i = 0; i < gOp.numSN; i++)
             {
                 listDebug.Items.Insert(0, (i + 1).ToString() + ":" + dgvForm.Rows[i].Cells[1].Value);
-                if (e.RowIndex != i && dgvForm.Rows[e.RowIndex].Cells[1].Value != null && dgvForm.Rows[i].Cells[1].Value != null) // compare
+                if (e.RowIndex != i && dgvForm.Rows[e.RowIndex].Cells[1].Value != null && dgvForm.Rows[i].Cells[1].Value != null && dgvForm.Rows[i].Cells[1].Value != null) // compare
                 {
                     if (dgvForm.Rows[e.RowIndex].Cells[1].Value.ToString() == dgvForm.Rows[i].Cells[1].Value.ToString())  // duplicated
                     {

@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dgvForm = new System.Windows.Forms.DataGridView();
             this.NO = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SN = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -73,6 +73,7 @@
             this.Btn_ScanAll = new System.Windows.Forms.Button();
             this.Btn_ListDevice = new System.Windows.Forms.Button();
             this.Btn_SNLoad = new System.Windows.Forms.Button();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgvForm)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStd)).BeginInit();
@@ -89,14 +90,14 @@
             this.dgvForm.BackgroundColor = System.Drawing.Color.DarkGray;
             this.dgvForm.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dgvForm.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("맑은 고딕", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgvForm.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("맑은 고딕", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvForm.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dgvForm.ColumnHeadersHeight = 70;
             this.dgvForm.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.dgvForm.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -118,8 +119,8 @@
             this.dgvForm.RowHeadersVisible = false;
             this.dgvForm.RowHeadersWidth = 15;
             this.dgvForm.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgvForm.RowsDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvForm.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dgvForm.RowTemplate.Height = 40;
             this.dgvForm.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.dgvForm.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
@@ -270,8 +271,8 @@
             this.dgvStd.MultiSelect = false;
             this.dgvStd.Name = "dgvStd";
             this.dgvStd.RowHeadersVisible = false;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgvStd.RowsDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvStd.RowsDefaultCellStyle = dataGridViewCellStyle3;
             this.dgvStd.RowTemplate.Height = 40;
             this.dgvStd.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.dgvStd.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
@@ -468,7 +469,7 @@
             this.LMessage2.Location = new System.Drawing.Point(1050, 608);
             this.LMessage2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.LMessage2.Name = "LMessage2";
-            this.LMessage2.Size = new System.Drawing.Size(9, 11);
+            this.LMessage2.Size = new System.Drawing.Size(13, 17);
             this.LMessage2.TabIndex = 13;
             this.LMessage2.Text = "-";
             // 
@@ -551,12 +552,25 @@
             this.Btn_SNLoad.UseVisualStyleBackColor = true;
             this.Btn_SNLoad.Click += new System.EventHandler(this.Btn_SNLoad_Click);
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.checkBox1.Location = new System.Drawing.Point(1299, 628);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(196, 25);
+            this.checkBox1.TabIndex = 19;
+            this.checkBox1.Text = "Display Current Value";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
             // FormZ1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 30F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1500, 686);
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.Btn_SNLoad);
             this.Controls.Add(this.Btn_ListDevice);
             this.Controls.Add(this.Btn_ScanAll);
@@ -575,7 +589,7 @@
             this.MinimizeBox = false;
             this.Name = "FormZ1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Z1 검사 툴 (버전 1.0.0.1)";
+            this.Text = "Z1 검사 툴 (버전 1.0.0.2)";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormZ1_FormClosed);
             this.Load += new System.EventHandler(this.FormZ1_Load);
             this.Shown += new System.EventHandler(this.FormZ1_Shown);
@@ -634,6 +648,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn BATT;
         private System.Windows.Forms.DataGridViewTextBoxColumn RESU;
         private System.Windows.Forms.Button Btn_SNLoad;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 

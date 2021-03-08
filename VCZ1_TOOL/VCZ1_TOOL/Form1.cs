@@ -105,6 +105,7 @@ namespace VCZ1_TOOL
         double[] z1_values = new double[6]; // 0:온도, 1:습도, 2:TVOC, 3:FANSPEED, 4:CO2, 5:BATTERY
         int read_complete = 0;
         Bleservice[] ble = new Bleservice[MAX_NUM_SN];
+        bool display_current = false;    // display current value instead of average.
 
         Color UPCOLOR = Color.FromArgb(0, 128, 255);
         Color DOWNCOLOR = Color.FromArgb(0, 64, 128);
@@ -318,5 +319,9 @@ namespace VCZ1_TOOL
 
         }
 
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            display_current = checkBox1.Checked;
+        }
     }
 }

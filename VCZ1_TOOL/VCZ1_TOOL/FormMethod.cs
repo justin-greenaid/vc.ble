@@ -504,37 +504,74 @@ namespace VCZ1_TOOL
             }
 
             //--- display value and error with color
-            dgvForm.Rows[index].Cells[3].Value = ((int)(gMeasure[index, 0].avg * 10)) / 10.0;
-            dgvForm.Rows[index].Cells[4].Value = ((int)(gMeasure[index, 1].avg * 10)) / 10.0;
-            dgvForm.Rows[index].Cells[5].Value = ((int)(gMeasure[index, 2].avg * 10)) / 10.0;
-            dgvForm.Rows[index].Cells[6].Value = ((int)(gMeasure[index, 3].avg * 10)) / 10.0;
-            dgvForm.Rows[index].Cells[7].Value = ((int)(gMeasure[index, 4].avg * 10)) / 10.0;
-            dgvForm.Rows[index].Cells[8].Value = ((int)(gMeasure[index, 5].avg * 10)) / 10.0;
+            if (display_current)
+            {
+                dgvForm.Rows[index].Cells[3].Value = ((int)(values[0] * 10)) / 10.0;
+                dgvForm.Rows[index].Cells[4].Value = ((int)(values[1] * 10)) / 10.0;
+                dgvForm.Rows[index].Cells[5].Value = ((int)(values[2] * 10)) / 10.0;
+                dgvForm.Rows[index].Cells[6].Value = ((int)(values[3] * 10)) / 10.0;
+                dgvForm.Rows[index].Cells[7].Value = ((int)(values[4] * 10)) / 10.0;
+                dgvForm.Rows[index].Cells[8].Value = ((int)(values[5] * 10)) / 10.0;
 
-            if (gMeasure[index, 0].avg > gCfg.temp[1] || gMeasure[index, 0].avg < gCfg.temp[2])
-                dgvForm.Rows[index].Cells[3].Style.BackColor = WARNCOLOR;
-            else
-                dgvForm.Rows[index].Cells[3].Style.BackColor = NORMALCOLOR;
+                if (values[0] > gCfg.temp[1] || values[0] < gCfg.temp[2])
+                    dgvForm.Rows[index].Cells[3].Style.BackColor = WARNCOLOR;
+                else
+                    dgvForm.Rows[index].Cells[3].Style.BackColor = NORMALCOLOR;
 
-            if (gMeasure[index, 1].avg > gCfg.humi[1] || gMeasure[index, 1].avg < gCfg.humi[2])
-                dgvForm.Rows[index].Cells[4].Style.BackColor = WARNCOLOR;
-            else
-                dgvForm.Rows[index].Cells[4].Style.BackColor = NORMALCOLOR;
+                if (values[1] > gCfg.humi[1] || values[1] < gCfg.humi[2])
+                    dgvForm.Rows[index].Cells[4].Style.BackColor = WARNCOLOR;
+                else
+                    dgvForm.Rows[index].Cells[4].Style.BackColor = NORMALCOLOR;
 
-            if (gMeasure[index, 2].avg > gCfg.tvoc[1] || gMeasure[index, 2].avg < gCfg.tvoc[2])
-                dgvForm.Rows[index].Cells[5].Style.BackColor = WARNCOLOR;
-            else
-                dgvForm.Rows[index].Cells[5].Style.BackColor = NORMALCOLOR;
+                if (values[2] > gCfg.tvoc[1] || values[2] < gCfg.tvoc[2])
+                    dgvForm.Rows[index].Cells[5].Style.BackColor = WARNCOLOR;
+                else
+                    dgvForm.Rows[index].Cells[5].Style.BackColor = NORMALCOLOR;
 
-            if (gMeasure[index, 3].avg > gCfg.fans[1] || gMeasure[index, 3].avg < gCfg.fans[2])
-                dgvForm.Rows[index].Cells[6].Style.BackColor = WARNCOLOR;
-            else
-                dgvForm.Rows[index].Cells[6].Style.BackColor = NORMALCOLOR;
+                if (values[3] > gCfg.fans[1] || values[3] < gCfg.fans[2])
+                    dgvForm.Rows[index].Cells[6].Style.BackColor = WARNCOLOR;
+                else
+                    dgvForm.Rows[index].Cells[6].Style.BackColor = NORMALCOLOR;
 
-            if (gMeasure[index, 4].avg > gCfg.co2[1] || gMeasure[index, 4].avg < gCfg.co2[2])
-                dgvForm.Rows[index].Cells[7].Style.BackColor = WARNCOLOR;
+                if (values[4] > gCfg.co2[1] || values[4] < gCfg.co2[2])
+                    dgvForm.Rows[index].Cells[7].Style.BackColor = WARNCOLOR;
+                else
+                    dgvForm.Rows[index].Cells[7].Style.BackColor = NORMALCOLOR;
+            }
             else
-                dgvForm.Rows[index].Cells[7].Style.BackColor = NORMALCOLOR;
+            {
+                dgvForm.Rows[index].Cells[3].Value = ((int)(gMeasure[index, 0].avg * 10)) / 10.0;
+                dgvForm.Rows[index].Cells[4].Value = ((int)(gMeasure[index, 1].avg * 10)) / 10.0;
+                dgvForm.Rows[index].Cells[5].Value = ((int)(gMeasure[index, 2].avg * 10)) / 10.0;
+                dgvForm.Rows[index].Cells[6].Value = ((int)(gMeasure[index, 3].avg * 10)) / 10.0;
+                dgvForm.Rows[index].Cells[7].Value = ((int)(gMeasure[index, 4].avg * 10)) / 10.0;
+                dgvForm.Rows[index].Cells[8].Value = ((int)(gMeasure[index, 5].avg * 10)) / 10.0;
+
+                if (gMeasure[index, 0].avg > gCfg.temp[1] || gMeasure[index, 0].avg < gCfg.temp[2])
+                    dgvForm.Rows[index].Cells[3].Style.BackColor = WARNCOLOR;
+                else
+                    dgvForm.Rows[index].Cells[3].Style.BackColor = NORMALCOLOR;
+
+                if (gMeasure[index, 1].avg > gCfg.humi[1] || gMeasure[index, 1].avg < gCfg.humi[2])
+                    dgvForm.Rows[index].Cells[4].Style.BackColor = WARNCOLOR;
+                else
+                    dgvForm.Rows[index].Cells[4].Style.BackColor = NORMALCOLOR;
+
+                if (gMeasure[index, 2].avg > gCfg.tvoc[1] || gMeasure[index, 2].avg < gCfg.tvoc[2])
+                    dgvForm.Rows[index].Cells[5].Style.BackColor = WARNCOLOR;
+                else
+                    dgvForm.Rows[index].Cells[5].Style.BackColor = NORMALCOLOR;
+
+                if (gMeasure[index, 3].avg > gCfg.fans[1] || gMeasure[index, 3].avg < gCfg.fans[2])
+                    dgvForm.Rows[index].Cells[6].Style.BackColor = WARNCOLOR;
+                else
+                    dgvForm.Rows[index].Cells[6].Style.BackColor = NORMALCOLOR;
+
+                if (gMeasure[index, 4].avg > gCfg.co2[1] || gMeasure[index, 4].avg < gCfg.co2[2])
+                    dgvForm.Rows[index].Cells[7].Style.BackColor = WARNCOLOR;
+                else
+                    dgvForm.Rows[index].Cells[7].Style.BackColor = NORMALCOLOR;
+            }
 
             dgvForm.Rows[index].Cells[8].Style.BackColor = NORMALCOLOR;
 

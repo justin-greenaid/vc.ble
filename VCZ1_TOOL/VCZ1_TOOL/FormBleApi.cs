@@ -31,6 +31,9 @@ namespace VCZ1_TOOL
             string parameters = "VC Z1 " + serial_number.Substring(serial_number.Length - 4);
             var result =ble[index].StartScan(parameters, (d) => listDebug.Items.Insert(0, d));
 
+            if (result == null)
+                return -1;
+            
             listDebug.Items.Insert(0, "[After Scan:" +gOp.SN[index] +"]" + result.ToString());
             if (result.Equals(ERROR_CODE.BLE_FOUND_DEVICE))
             {
