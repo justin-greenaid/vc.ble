@@ -17,7 +17,7 @@ namespace VCZ1_TOOL
     public partial class FormZ1 : Form
     {
         const int MAX_NUM_SN = 10;
-        const int CELL_HEIGHT = 60;
+        const int CELL_HEIGHT = 62;
         const int CELL_HEIGHT_STD = 45;
 
         public struct Z1_Config
@@ -32,6 +32,7 @@ namespace VCZ1_TOOL
             public int log_method;  // 0: avg, 1:all
             public int numMaxDevice;
             public string log_dir;
+            public string prefix;   //"    "로 둘러쌓여야 함.
         }
 
         public struct Z1_Operation

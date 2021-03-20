@@ -87,12 +87,12 @@
             this.dgvForm.AllowUserToDeleteRows = false;
             this.dgvForm.AllowUserToResizeColumns = false;
             this.dgvForm.AllowUserToResizeRows = false;
-            this.dgvForm.BackgroundColor = System.Drawing.Color.DarkGray;
+            this.dgvForm.BackgroundColor = System.Drawing.Color.Silver;
             this.dgvForm.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dgvForm.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("맑은 고딕", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("맑은 고딕", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
             dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
@@ -112,8 +112,8 @@
             this.BATT,
             this.RESU});
             this.dgvForm.GridColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.dgvForm.Location = new System.Drawing.Point(0, 2);
-            this.dgvForm.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.dgvForm.Location = new System.Drawing.Point(0, 1);
+            this.dgvForm.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.dgvForm.MultiSelect = false;
             this.dgvForm.Name = "dgvForm";
             this.dgvForm.RowHeadersVisible = false;
@@ -124,7 +124,7 @@
             this.dgvForm.RowTemplate.Height = 40;
             this.dgvForm.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.dgvForm.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dgvForm.Size = new System.Drawing.Size(1042, 672);
+            this.dgvForm.Size = new System.Drawing.Size(952, 691);
             this.dgvForm.TabIndex = 0;
             this.dgvForm.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dgvForm_CellBeginEdit);
             this.dgvForm.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvForm_CellEndEdit);
@@ -152,6 +152,7 @@
             this.PAIR.Name = "PAIR";
             this.PAIR.ReadOnly = true;
             this.PAIR.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.PAIR.Width = 80;
             // 
             // TEMP
             // 
@@ -166,11 +167,13 @@
             this.HUMI.Name = "HUMI";
             this.HUMI.ReadOnly = true;
             this.HUMI.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.HUMI.Width = 90;
             // 
             // TVOC
             // 
             this.TVOC.HeaderText = "TVOC";
             this.TVOC.Name = "TVOC";
+            this.TVOC.Width = 90;
             // 
             // FANS
             // 
@@ -179,13 +182,13 @@
             this.FANS.ReadOnly = true;
             this.FANS.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.FANS.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.FANS.Width = 120;
             // 
             // CO2
             // 
             this.CO2.HeaderText = "CO2";
             this.CO2.Name = "CO2";
             this.CO2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.CO2.Width = 90;
             // 
             // BATT
             // 
@@ -193,6 +196,7 @@
             this.BATT.Name = "BATT";
             this.BATT.ReadOnly = true;
             this.BATT.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.BATT.Width = 90;
             // 
             // RESU
             // 
@@ -200,11 +204,11 @@
             this.RESU.Name = "RESU";
             this.RESU.ReadOnly = true;
             this.RESU.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.RESU.Width = 90;
+            this.RESU.Width = 80;
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.panel1.BackColor = System.Drawing.SystemColors.Window;
             this.panel1.Controls.Add(this.Btn_Action);
             this.panel1.Controls.Add(this.Btn_Standard);
             this.panel1.Controls.Add(this.dgvStd);
@@ -212,10 +216,10 @@
             this.panel1.Controls.Add(this.textBox2);
             this.panel1.Controls.Add(this.panel3);
             this.panel1.Font = new System.Drawing.Font("맑은 고딕", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.panel1.Location = new System.Drawing.Point(1050, 2);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.panel1.Location = new System.Drawing.Point(968, 2);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(445, 593);
+            this.panel1.Size = new System.Drawing.Size(388, 579);
             this.panel1.TabIndex = 3;
             // 
             // Btn_Action
@@ -225,11 +229,11 @@
             this.Btn_Action.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
             this.Btn_Action.Font = new System.Drawing.Font("Verdana", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Btn_Action.ForeColor = System.Drawing.Color.Black;
-            this.Btn_Action.Location = new System.Drawing.Point(2, 0);
-            this.Btn_Action.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.Btn_Action.Location = new System.Drawing.Point(2, 5);
+            this.Btn_Action.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.Btn_Action.Name = "Btn_Action";
-            this.Btn_Action.Size = new System.Drawing.Size(434, 50);
-            this.Btn_Action.TabIndex = 9;
+            this.Btn_Action.Size = new System.Drawing.Size(384, 47);
+            this.Btn_Action.TabIndex = 1;
             this.Btn_Action.Text = "준비";
             this.Btn_Action.UseVisualStyleBackColor = false;
             this.Btn_Action.Click += new System.EventHandler(this.Btn_Action_Click);
@@ -239,11 +243,11 @@
             // 
             this.Btn_Standard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
             this.Btn_Standard.Font = new System.Drawing.Font("Verdana", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Btn_Standard.Location = new System.Drawing.Point(2, 68);
-            this.Btn_Standard.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.Btn_Standard.Location = new System.Drawing.Point(2, 63);
+            this.Btn_Standard.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.Btn_Standard.Name = "Btn_Standard";
-            this.Btn_Standard.Size = new System.Drawing.Size(434, 50);
-            this.Btn_Standard.TabIndex = 8;
+            this.Btn_Standard.Size = new System.Drawing.Size(384, 47);
+            this.Btn_Standard.TabIndex = 2;
             this.Btn_Standard.Text = "검사기준 편집";
             this.Btn_Standard.UseVisualStyleBackColor = false;
             this.Btn_Standard.Click += new System.EventHandler(this.Btn_Standard_Click);
@@ -266,8 +270,8 @@
             this.Column2,
             this.Column3});
             this.dgvStd.Enabled = false;
-            this.dgvStd.Location = new System.Drawing.Point(4, 116);
-            this.dgvStd.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.dgvStd.Location = new System.Drawing.Point(4, 109);
+            this.dgvStd.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.dgvStd.MultiSelect = false;
             this.dgvStd.Name = "dgvStd";
             this.dgvStd.RowHeadersVisible = false;
@@ -276,8 +280,8 @@
             this.dgvStd.RowTemplate.Height = 40;
             this.dgvStd.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.dgvStd.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dgvStd.Size = new System.Drawing.Size(431, 264);
-            this.dgvStd.TabIndex = 7;
+            this.dgvStd.Size = new System.Drawing.Size(381, 265);
+            this.dgvStd.TabIndex = 3;
             this.dgvStd.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvStd_CellContentClick);
             // 
             // TYPE
@@ -288,14 +292,14 @@
             this.TYPE.ReadOnly = true;
             this.TYPE.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.TYPE.ToolTipText = "TYPE";
-            this.TYPE.Width = 180;
+            this.TYPE.Width = 140;
             // 
             // Column1
             // 
             this.Column1.HeaderText = "스펙";
             this.Column1.Name = "Column1";
             this.Column1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Column1.Width = 90;
+            this.Column1.Width = 80;
             // 
             // Column2
             // 
@@ -316,25 +320,26 @@
             this.textBox3.BackColor = System.Drawing.SystemColors.Control;
             this.textBox3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBox3.Enabled = false;
-            this.textBox3.Font = new System.Drawing.Font("Verdana", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox3.Location = new System.Drawing.Point(275, 380);
-            this.textBox3.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.textBox3.Font = new System.Drawing.Font("Verdana", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox3.Location = new System.Drawing.Point(224, 374);
+            this.textBox3.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(160, 46);
-            this.textBox3.TabIndex = 6;
+            this.textBox3.Size = new System.Drawing.Size(161, 43);
+            this.textBox3.TabIndex = 4;
             this.textBox3.Text = "5";
             this.textBox3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // textBox2
             // 
             this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox2.Font = new System.Drawing.Font("Verdana", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox2.Location = new System.Drawing.Point(4, 380);
-            this.textBox2.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.textBox2.Font = new System.Drawing.Font("Verdana", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox2.Location = new System.Drawing.Point(4, 374);
+            this.textBox2.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.textBox2.Name = "textBox2";
             this.textBox2.ReadOnly = true;
-            this.textBox2.Size = new System.Drawing.Size(272, 46);
+            this.textBox2.Size = new System.Drawing.Size(221, 43);
             this.textBox2.TabIndex = 5;
+            this.textBox2.TabStop = false;
             this.textBox2.Text = "측정시간(분)";
             this.textBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -346,10 +351,10 @@
             this.panel3.Controls.Add(this.Btn_Log);
             this.panel3.Controls.Add(this.Btn_Pair);
             this.panel3.Font = new System.Drawing.Font("맑은 고딕", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.panel3.Location = new System.Drawing.Point(4, 431);
-            this.panel3.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.panel3.Location = new System.Drawing.Point(4, 429);
+            this.panel3.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(431, 151);
+            this.panel3.Size = new System.Drawing.Size(384, 141);
             this.panel3.TabIndex = 11;
             // 
             // panel2
@@ -359,17 +364,17 @@
             this.panel2.Controls.Add(this.RB_AVG);
             this.panel2.Font = new System.Drawing.Font("Tahoma", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.panel2.Location = new System.Drawing.Point(4, 6);
-            this.panel2.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(194, 65);
-            this.panel2.TabIndex = 10;
+            this.panel2.Size = new System.Drawing.Size(178, 61);
+            this.panel2.TabIndex = 5;
             // 
             // RB_ALL
             // 
             this.RB_ALL.AutoSize = true;
             this.RB_ALL.Font = new System.Drawing.Font("Verdana", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.RB_ALL.Location = new System.Drawing.Point(5, 34);
-            this.RB_ALL.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.RB_ALL.Location = new System.Drawing.Point(5, 32);
+            this.RB_ALL.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.RB_ALL.Name = "RB_ALL";
             this.RB_ALL.Size = new System.Drawing.Size(156, 29);
             this.RB_ALL.TabIndex = 1;
@@ -383,7 +388,7 @@
             this.RB_AVG.AutoSize = true;
             this.RB_AVG.Font = new System.Drawing.Font("Verdana", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.RB_AVG.Location = new System.Drawing.Point(5, 5);
-            this.RB_AVG.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.RB_AVG.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.RB_AVG.Name = "RB_AVG";
             this.RB_AVG.Size = new System.Drawing.Size(172, 29);
             this.RB_AVG.TabIndex = 0;
@@ -397,11 +402,11 @@
             // 
             this.Btn_Stop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
             this.Btn_Stop.Font = new System.Drawing.Font("Verdana", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Btn_Stop.Location = new System.Drawing.Point(231, 76);
-            this.Btn_Stop.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.Btn_Stop.Location = new System.Drawing.Point(191, 71);
+            this.Btn_Stop.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.Btn_Stop.Name = "Btn_Stop";
-            this.Btn_Stop.Size = new System.Drawing.Size(189, 65);
-            this.Btn_Stop.TabIndex = 6;
+            this.Btn_Stop.Size = new System.Drawing.Size(189, 61);
+            this.Btn_Stop.TabIndex = 8;
             this.Btn_Stop.Text = "측정강제종료";
             this.Btn_Stop.UseVisualStyleBackColor = false;
             this.Btn_Stop.Click += new System.EventHandler(this.Btn_Stop_Click);
@@ -411,12 +416,12 @@
             // Btn_Log
             // 
             this.Btn_Log.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
-            this.Btn_Log.Font = new System.Drawing.Font("Verdana", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Btn_Log.Location = new System.Drawing.Point(231, 6);
-            this.Btn_Log.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.Btn_Log.Font = new System.Drawing.Font("Verdana", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Btn_Log.Location = new System.Drawing.Point(191, 6);
+            this.Btn_Log.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.Btn_Log.Name = "Btn_Log";
-            this.Btn_Log.Size = new System.Drawing.Size(189, 65);
-            this.Btn_Log.TabIndex = 7;
+            this.Btn_Log.Size = new System.Drawing.Size(189, 61);
+            this.Btn_Log.TabIndex = 6;
             this.Btn_Log.Text = "LOG DATA";
             this.Btn_Log.UseVisualStyleBackColor = false;
             this.Btn_Log.Click += new System.EventHandler(this.Btn_Log_Click);
@@ -427,11 +432,11 @@
             // 
             this.Btn_Pair.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
             this.Btn_Pair.Font = new System.Drawing.Font("Verdana", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Btn_Pair.Location = new System.Drawing.Point(4, 76);
-            this.Btn_Pair.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.Btn_Pair.Location = new System.Drawing.Point(1, 71);
+            this.Btn_Pair.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.Btn_Pair.Name = "Btn_Pair";
-            this.Btn_Pair.Size = new System.Drawing.Size(194, 65);
-            this.Btn_Pair.TabIndex = 4;
+            this.Btn_Pair.Size = new System.Drawing.Size(184, 61);
+            this.Btn_Pair.TabIndex = 7;
             this.Btn_Pair.Text = "측정 시작";
             this.Btn_Pair.UseVisualStyleBackColor = false;
             this.Btn_Pair.Click += new System.EventHandler(this.Btn_Pair_Click);
@@ -442,10 +447,10 @@
             // 
             this.Btn_Unpair.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
             this.Btn_Unpair.Font = new System.Drawing.Font("Verdana", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Btn_Unpair.Location = new System.Drawing.Point(722, 730);
-            this.Btn_Unpair.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.Btn_Unpair.Location = new System.Drawing.Point(666, 727);
+            this.Btn_Unpair.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.Btn_Unpair.Name = "Btn_Unpair";
-            this.Btn_Unpair.Size = new System.Drawing.Size(167, 92);
+            this.Btn_Unpair.Size = new System.Drawing.Size(154, 86);
             this.Btn_Unpair.TabIndex = 5;
             this.Btn_Unpair.Text = "페어링 삭제";
             this.Btn_Unpair.UseVisualStyleBackColor = false;
@@ -456,17 +461,17 @@
             // LMessage
             // 
             this.LMessage.AutoSize = true;
-            this.LMessage.Location = new System.Drawing.Point(661, 565);
+            this.LMessage.Location = new System.Drawing.Point(610, 527);
             this.LMessage.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.LMessage.Name = "LMessage";
-            this.LMessage.Size = new System.Drawing.Size(0, 30);
+            this.LMessage.Size = new System.Drawing.Size(0, 28);
             this.LMessage.TabIndex = 12;
             // 
             // LMessage2
             // 
             this.LMessage2.AutoSize = true;
             this.LMessage2.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.LMessage2.Location = new System.Drawing.Point(1050, 608);
+            this.LMessage2.Location = new System.Drawing.Point(968, 606);
             this.LMessage2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.LMessage2.Name = "LMessage2";
             this.LMessage2.Size = new System.Drawing.Size(13, 17);
@@ -478,10 +483,10 @@
             this.listDebug.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.listDebug.FormattingEnabled = true;
             this.listDebug.ItemHeight = 17;
-            this.listDebug.Location = new System.Drawing.Point(0, 730);
-            this.listDebug.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.listDebug.Location = new System.Drawing.Point(0, 727);
+            this.listDebug.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.listDebug.Name = "listDebug";
-            this.listDebug.Size = new System.Drawing.Size(695, 157);
+            this.listDebug.Size = new System.Drawing.Size(642, 140);
             this.listDebug.TabIndex = 14;
             // 
             // timer100
@@ -498,7 +503,7 @@
             this.LWARNING.AutoSize = true;
             this.LWARNING.Font = new System.Drawing.Font("맑은 고딕", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LWARNING.ForeColor = System.Drawing.Color.Red;
-            this.LWARNING.Location = new System.Drawing.Point(1050, 643);
+            this.LWARNING.Location = new System.Drawing.Point(968, 664);
             this.LWARNING.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.LWARNING.Name = "LWARNING";
             this.LWARNING.Size = new System.Drawing.Size(20, 25);
@@ -522,10 +527,10 @@
             // 
             // Btn_ScanAll
             // 
-            this.Btn_ScanAll.Location = new System.Drawing.Point(897, 730);
-            this.Btn_ScanAll.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.Btn_ScanAll.Location = new System.Drawing.Point(828, 727);
+            this.Btn_ScanAll.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.Btn_ScanAll.Name = "Btn_ScanAll";
-            this.Btn_ScanAll.Size = new System.Drawing.Size(147, 47);
+            this.Btn_ScanAll.Size = new System.Drawing.Size(136, 44);
             this.Btn_ScanAll.TabIndex = 16;
             this.Btn_ScanAll.Text = "Scan All";
             this.Btn_ScanAll.UseVisualStyleBackColor = true;
@@ -533,10 +538,10 @@
             // 
             // Btn_ListDevice
             // 
-            this.Btn_ListDevice.Location = new System.Drawing.Point(897, 784);
-            this.Btn_ListDevice.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.Btn_ListDevice.Location = new System.Drawing.Point(828, 732);
+            this.Btn_ListDevice.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.Btn_ListDevice.Name = "Btn_ListDevice";
-            this.Btn_ListDevice.Size = new System.Drawing.Size(147, 38);
+            this.Btn_ListDevice.Size = new System.Drawing.Size(136, 35);
             this.Btn_ListDevice.TabIndex = 17;
             this.Btn_ListDevice.Text = "List Devices";
             this.Btn_ListDevice.UseVisualStyleBackColor = true;
@@ -544,9 +549,10 @@
             // 
             // Btn_SNLoad
             // 
-            this.Btn_SNLoad.Location = new System.Drawing.Point(722, 833);
+            this.Btn_SNLoad.Location = new System.Drawing.Point(666, 777);
+            this.Btn_SNLoad.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.Btn_SNLoad.Name = "Btn_SNLoad";
-            this.Btn_SNLoad.Size = new System.Drawing.Size(322, 40);
+            this.Btn_SNLoad.Size = new System.Drawing.Size(296, 37);
             this.Btn_SNLoad.TabIndex = 18;
             this.Btn_SNLoad.Text = "Load snlist.txt";
             this.Btn_SNLoad.UseVisualStyleBackColor = true;
@@ -556,20 +562,21 @@
             // 
             this.checkBox1.AutoSize = true;
             this.checkBox1.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.checkBox1.Location = new System.Drawing.Point(1299, 628);
+            this.checkBox1.Location = new System.Drawing.Point(1139, 638);
+            this.checkBox1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(196, 25);
-            this.checkBox1.TabIndex = 19;
+            this.checkBox1.TabIndex = 9;
             this.checkBox1.Text = "Display Current Value";
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // FormZ1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 30F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 28F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1500, 686);
+            this.BackColor = System.Drawing.SystemColors.Window;
+            this.ClientSize = new System.Drawing.Size(1367, 696);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.Btn_SNLoad);
             this.Controls.Add(this.Btn_ListDevice);
@@ -582,14 +589,14 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.dgvForm);
             this.DoubleBuffered = true;
-            this.Font = new System.Drawing.Font("맑은 고딕", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.Font = new System.Drawing.Font("맑은 고딕", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Margin = new System.Windows.Forms.Padding(4, 8, 4, 8);
+            this.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FormZ1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Z1 검사 툴 (버전 1.0.0.2)";
+            this.Text = "PSZ 검사 툴 (버전 1.0.0.3)";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormZ1_FormClosed);
             this.Load += new System.EventHandler(this.FormZ1_Load);
             this.Shown += new System.EventHandler(this.FormZ1_Shown);
@@ -633,6 +640,8 @@
         private System.Windows.Forms.Button Btn_ScanAll;
         private System.Windows.Forms.Button Btn_ListDevice;
         private System.Windows.Forms.Button Btn_Action;
+        private System.Windows.Forms.Button Btn_SNLoad;
+        private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.DataGridViewTextBoxColumn TYPE;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
@@ -647,8 +656,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn CO2;
         private System.Windows.Forms.DataGridViewTextBoxColumn BATT;
         private System.Windows.Forms.DataGridViewTextBoxColumn RESU;
-        private System.Windows.Forms.Button Btn_SNLoad;
-        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 

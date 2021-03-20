@@ -28,7 +28,7 @@ namespace VCZ1_TOOL
             if (index < 0 || index >= MAX_NUM_SN)
                 return -1;
 
-            string parameters = "VC Z1 " + serial_number.Substring(serial_number.Length - 4);
+            string parameters = gCfg.prefix + " " + serial_number.Substring(serial_number.Length - 4);
             var result =ble[index].StartScan(parameters, (d) => listDebug.Items.Insert(0, d));
 
             if (result == null)
@@ -129,7 +129,7 @@ namespace VCZ1_TOOL
         {
 #if _BLOCKED_BY_JUSTIN_
             //--- check if SN is connected
-            if (Z1_GetDeviceConnectionStatus(index, "VC Z1 " + gOp.SN[index].Substring(gOp.SN[index].Length - 4)) == ERROR_CODE.BLE_NO_CONNECTED)
+            if (Z1_GetDeviceConnectionStatus(index, gCfg.prefix + " "  + gOp.SN[index].Substring(gOp.SN[index].Length - 4)) == ERROR_CODE.BLE_NO_CONNECTED)
             {
                 Task<int> ret = Z1_PAIR_SN(index, gOp.SN[index]);
                 int result = await ret;
@@ -157,7 +157,7 @@ namespace VCZ1_TOOL
             read_complete = 1;
             // 온도
             string characteristic_name = "EnvironmentalSensing/Temperature";
-            string dev_name = "VC Z1 " + gOp.SN[index].Substring(gOp.SN[index].Length - 4);
+            string dev_name = gCfg.prefix + " " + gOp.SN[index].Substring(gOp.SN[index].Length - 4);
 
             //listDebug.Items.Insert(0, $"set {characteristic_name}");
             ERROR_CODE error_code = await ble[index].ReadCharacteristic(dev_name, characteristic_name);

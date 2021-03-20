@@ -31,8 +31,8 @@ namespace VCZ1_TOOL
             string strRet;
             string[] srVals =  { "1", "2", "3" };
 
-            INIFile inif = new INIFile(strCheckFolder+"\\Z1CONFIG.ini");
-            if (File.Exists(strCheckFolder + "\\Z1CONFIG.ini"))
+            INIFile inif = new INIFile(strCheckFolder+ "\\PSZCONFIG.ini");
+            if (File.Exists(strCheckFolder + "\\PSZCONFIG.ini"))
             {
                 strRet = inif.Read("Configuration", "temperature");
                 srVals = strRet.Split(',');
@@ -64,6 +64,9 @@ namespace VCZ1_TOOL
                 gCfg.log_method = int.Parse(inif.Read("Configuration", "log_method"));
                 gCfg.numMaxDevice = int.Parse(inif.Read("Configuration", "num_max_devices"));
                 gCfg.log_dir = inif.Read("Configuration", "log_dir");
+                gCfg.prefix = inif.Read("Configuration", "name_prefix");
+                if (gCfg.prefix == "")
+                    gCfg.prefix = "VC PSZ";
             }
             else
             {
@@ -91,13 +94,14 @@ namespace VCZ1_TOOL
                 gCfg.numMaxDevice = 50;
 
                 gCfg.log_dir = "c:\\temp";
+                gCfg.prefix = "VC PSZ";
             }
         }
 
         private void Write_Configuration()
         {
             // Write configuration
-            string inifilename = strCheckFolder + "\\Z1CONFIG.ini";
+            string inifilename = strCheckFolder + "\\PSZCONFIG.ini";
             INIFile inif = new INIFile(inifilename);
 
             string strData = string.Format("{0},{1},{2}", gCfg.temp[0], gCfg.temp[1], gCfg.temp[2]);
@@ -128,6 +132,7 @@ namespace VCZ1_TOOL
             inif.Write("Configuration", "num_max_devices", strData);
 
             inif.Write("Configuration", "log_dir", gCfg.log_dir);
+            inif.Write("Configuration", "name_prefix", gCfg.prefix);
         }
 
         private void Create_Grid_Component()
@@ -361,7 +366,7 @@ namespace VCZ1_TOOL
                 listDebug.Items.Insert(0, "=================== Start " + index.ToString() + "-th Device");
 
                 //--- check if SN is connected
-                string device_name = "VC Z1 " + pMain.gOp.SN[index].Substring(pMain.gOp.SN[index].Length - 4);
+                string device_name = gCfg.prefix + " " + pMain.gOp.SN[index].Substring(pMain.gOp.SN[index].Length - 4);
                 if (pMain.Z1_GetDeviceConnectionStatus(index, device_name) == ERROR_CODE.BLE_NO_CONNECTED)
                 {
                     result = await pMain.BleConnect(index, device_name);
@@ -380,7 +385,7 @@ namespace VCZ1_TOOL
                 {
                     // 온도
                     string characteristic_name = "EnvironmentalSensing/Temperature";
-                    string dev_name = "VC Z1 " + gOp.SN[index].Substring(gOp.SN[index].Length - 4);
+                    string dev_name = gCfg.prefix + " " + gOp.SN[index].Substring(gOp.SN[index].Length - 4);
                     string[] srVals = { "0", "0", "0", "0", "0" };
                     string srData;
 
