@@ -74,6 +74,7 @@
             this.Btn_ListDevice = new System.Windows.Forms.Button();
             this.Btn_SNLoad = new System.Windows.Forms.Button();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.timerStop = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.dgvForm)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStd)).BeginInit();
@@ -571,6 +572,10 @@
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
+            // timerStop
+            // 
+            this.timerStop.Tick += new System.EventHandler(this.timerStop_Tick);
+            // 
             // FormZ1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 28F);
@@ -656,6 +661,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn CO2;
         private System.Windows.Forms.DataGridViewTextBoxColumn BATT;
         private System.Windows.Forms.DataGridViewTextBoxColumn RESU;
+        private System.Windows.Forms.Timer timerStop;
     }
 }
 

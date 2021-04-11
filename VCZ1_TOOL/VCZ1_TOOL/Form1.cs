@@ -53,7 +53,8 @@ namespace VCZ1_TOOL
             public List<string> SN;
             public List<string> ScannedSN;
             public string strLogDate;               // Log filename = SN_strLogDate.csv
- 
+            public int[] ThreadStatus;               // 0: ended, 1:running
+
             public void Clear()
             {
                 std_mode = 0;
@@ -121,6 +122,8 @@ namespace VCZ1_TOOL
         Color ENABLEDCOLOR = Color.White;
         Color ONCOLOR = Color.LightGray;
         Color OFFCOLOR = Color.Gray;
+
+        FormMessage mFormMessage = new FormMessage();
 
         public FormZ1()
         {
@@ -323,6 +326,30 @@ namespace VCZ1_TOOL
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             display_current = checkBox1.Checked;
+        }
+
+        private void timerStop_Tick(object sender, EventArgs e)
+        {
+            int i;
+            bool bStatusRunning = false;
+
+            for (i = 0; i < MAX_NUM_SN; i++)
+            {
+                if (gOp.ThreadStatus[i] == 1)
+                {
+                    bStatusRunning = true;
+                    break;
+                }
+            }
+
+            if (bStatusRunning == false)
+            {
+                mFormMessage.Hide();
+                timerStop.Enabled = false;
+                Button_Enable(gOp.mode);
+                //--- enable timer for stopping
+                SetCurrentInputPostion();
+            }
         }
     }
 }

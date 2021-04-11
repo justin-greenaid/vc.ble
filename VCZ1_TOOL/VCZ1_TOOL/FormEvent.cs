@@ -95,9 +95,7 @@ namespace VCZ1_TOOL
         private void Btn_Stop_Click(object sender, EventArgs e)
         {
             listDebug.Items.Insert(0, "--- Stop Started");
-
             Stop_Measure();
-            SetCurrentInputPostion();
         }
 
         private void RB_AVG_Click(object sender, EventArgs e)

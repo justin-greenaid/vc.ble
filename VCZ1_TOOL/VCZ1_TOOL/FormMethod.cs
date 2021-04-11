@@ -141,6 +141,7 @@ namespace VCZ1_TOOL
             gOp.SN = new List<string>();
             gOp.ScannedSN = new List<string>();
             gOp.ValidDevice = new int[MAX_NUM_SN];
+            gOp.ThreadStatus = new int[MAX_NUM_SN];
             gOp.numRead = new int[MAX_NUM_SN];
             gOp.id = new int[MAX_NUM_SN];
             gOp.Clear();
@@ -159,6 +160,7 @@ namespace VCZ1_TOOL
                 dgvForm.Rows.Add(row);
                 dgvForm.Rows[n].Height = CELL_HEIGHT;
                 dgvForm.Rows[n].Cells[1].Style.BackColor = Color.White;
+                gOp.ThreadStatus[n] = 0;
             }
 
             dgvForm.Rows[0].Cells[1].Selected = true;
@@ -335,19 +337,23 @@ namespace VCZ1_TOOL
 
         private void Stop_Measure()
         {
+            int i;
+
             gOp.mode = 1;   // measuring
             timerPolling.Enabled = false;
             timer500.Enabled = false;
 
-            Button_Enable(gOp.mode);
-            for (int i = 0; i < MAX_NUM_SN; i++)
-            {
+            for (i = 0; i < MAX_NUM_SN; i++)
+            { 
                 if (gOp.ValidDevice[i] == 1)
                 {
                     gOp.ValidDevice[i] = 0;
                     gThread[i].Join();
                 }
             }
+            timerStop.Enabled = true;
+            Btn_Stop.Enabled = false;
+            mFormMessage.Show();
         }
 
         public async void DataReading(int index, FormZ1 myclass)
@@ -357,14 +363,17 @@ namespace VCZ1_TOOL
             long iElapsedTime = 0;
             DateTimeOffset dtStartTime = DateTime.Now;
             DateTimeOffset dtCurTime = DateTime.Now;
+            gOp.ThreadStatus[index] = 1;
 
             while (pMain.gOp.ValidDevice[index] == 1)
             {
-                Thread.Sleep(1000);
+                //Thread.Sleep(1000);
 
                 ERROR_CODE result = ERROR_CODE.NONE;
                 listDebug.Items.Insert(0, "=================== Start " + index.ToString() + "-th Device");
 
+                if (pMain.gOp.ValidDevice[index] == 0)
+                    break;
                 //--- check if SN is connected
                 string device_name = gCfg.prefix + " " + pMain.gOp.SN[index].Substring(pMain.gOp.SN[index].Length - 4);
                 if (pMain.Z1_GetDeviceConnectionStatus(index, device_name) == ERROR_CODE.BLE_NO_CONNECTED)
@@ -383,6 +392,8 @@ namespace VCZ1_TOOL
                 dtStartTime = DateTime.Now;   
                 try
                 {
+                    if (pMain.gOp.ValidDevice[index] == 0)
+                        break;
                     // 온도
                     string characteristic_name = "EnvironmentalSensing/Temperature";
                     string dev_name = gCfg.prefix + " " + gOp.SN[index].Substring(gOp.SN[index].Length - 4);
@@ -401,6 +412,8 @@ namespace VCZ1_TOOL
                     values[0] = values[0] / 100.0;
                     listDebug.Items.Insert(0, gOp.SN[index] + "(온도):" + srVals[1] + " "+ srVals[2] + "==>" + values[0].ToString());
 
+                    if (pMain.gOp.ValidDevice[index] == 0)
+                        break;
                     // 습도
                     characteristic_name = "EnvironmentalSensing/Humidity";
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
@@ -415,6 +428,8 @@ namespace VCZ1_TOOL
                     values[1] = values[1] / 100.0;
                     listDebug.Items.Insert(0, gOp.SN[index] + "(습도):" + srVals[1] + " " + srVals[2] + "==>" + values[1].ToString());
 
+                    if (pMain.gOp.ValidDevice[index] == 0)
+                        break;
                     // TVOC
                     characteristic_name = "EnvironmentalSensing/TVOC";
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
@@ -428,6 +443,8 @@ namespace VCZ1_TOOL
                     values[2] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     listDebug.Items.Insert(0, gOp.SN[index] + "(TVOC):" + srVals[1] + " " + srVals[2] + "==>" + values[2].ToString());
 
+                    if (pMain.gOp.ValidDevice[index] == 0)
+                        break;
                     // FANSPEED
                     characteristic_name = "VCService/FanSpeed";
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
@@ -441,6 +458,8 @@ namespace VCZ1_TOOL
                     values[3] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     listDebug.Items.Insert(0, gOp.SN[index] + "(FANS):" + srVals[1] + " " + srVals[2] + "==>" + values[3].ToString());
 
+                    if (pMain.gOp.ValidDevice[index] == 0)
+                        break;
                     // CO2
                     characteristic_name = "EnvironmentalSensing/Co2";
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
@@ -454,6 +473,8 @@ namespace VCZ1_TOOL
                     values[4] = int.Parse(srVals[4]) * 16777215 + int.Parse(srVals[3]) * 655536 + int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     listDebug.Items.Insert(0, gOp.SN[index] + "(CO2):" + ble[index].getCharacteristic() + "==>" + values[4].ToString());
 
+                    if (pMain.gOp.ValidDevice[index] == 0)
+                        break;
                     // BATTERY
                     characteristic_name = "Battery/BatteryLevel";
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
@@ -478,10 +499,10 @@ namespace VCZ1_TOOL
                 Post_Processing_Result(index, values);
                 Set_Connection_Status(index, true);
             }
-
             pMain.listDebug.Items.Insert(0, ">>>>>>>>>>>>>>>>>>>>>> Ended " + index.ToString() + "-th Device");
             pMain.Write_AverageMinMax(index);
             pMain.listDebug.Items.Insert(0, ">>>>>>>>>>>>>>>>>>>>>> Writed average " + index.ToString() + "-th Device");
+            gOp.ThreadStatus[index] = 0;
         }
 
         private void Post_Processing_Result(int index, double [] values)
