@@ -601,7 +601,7 @@
             this.MinimizeBox = false;
             this.Name = "FormZ1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "PSZ 검사 툴 (버전 1.0.0.3)";
+            this.Text = "PSZ 검사 툴 (버전 1.0.0.4)";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormZ1_FormClosed);
             this.Load += new System.EventHandler(this.FormZ1_Load);
             this.Shown += new System.EventHandler(this.FormZ1_Shown);
