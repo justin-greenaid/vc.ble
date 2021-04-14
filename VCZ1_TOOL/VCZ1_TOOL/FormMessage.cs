@@ -16,5 +16,11 @@ namespace VCZ1_TOOL
         {
             InitializeComponent();
         }
+
+        public void Set_Message(string str)
+        {
+            lRun.Text = str;
+        }
     }
+
 }

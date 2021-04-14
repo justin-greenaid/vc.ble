@@ -16,6 +16,19 @@ namespace VCZ1_TOOL
 {
     public partial class FormZ1 : Form
     {
+        private void Logging_Debug_Message(string strMessage)
+        {
+            // Logging
+
+        }
+
+        private void Output_Debug_Message(int index, string strMessage)
+        {
+            // if (index < 0) listDebug.Items.Add(strMessage)
+            // else listDebug.Items.Insert(index, strMessage)
+
+        }
+
         private void Read_Configuration()
         {
             int i;
@@ -280,13 +293,8 @@ namespace VCZ1_TOOL
                 for (int k = 0; k < 6; k++)
                     gMeasure[i, k].Reset();
 
-            //--- connect 
-            //Task<int> ret = Z1_PAIR_SN(gOp.curIndex, gOp.SN[gOp.curIndex]);
-            //int result = await ret;
-
             //--- file open
             gOp.curStartTime = DateTime.Now;
-            gOp.startTime = gOp.curStartTime;
             gOp.strLogDate = gOp.curStartTime.ToString("yyyyMMdd_hhmmss");
 
             for (int i=0; i < MAX_NUM_SN; i++)
@@ -300,21 +308,6 @@ namespace VCZ1_TOOL
                 }
             }
 
-#if _USE_TIMER
-            //--- Start Measuring
-            gOp.curIndex = Get_Next_SN(gOp.curIndex);
-            if (gOp.curIndex < 0)
-            {
-                Warning_Message("No Devices");
-                Stop_Measure();
-                return;
-            }
-
-            //--- Enable Timers
-            timerPolling.Interval = gCfg.read_freq; // * 1000;
-            timerPolling.Enabled = true;
-            timer500.Enabled = true;
-#else
             if (gOp.numSN == 0)
             {
                 Warning_Message("No Devices");
@@ -332,28 +325,32 @@ namespace VCZ1_TOOL
                     Thread.Sleep(20);
                 }
             }
-#endif
         }
 
         private void Stop_Measure()
         {
+            if (gOp.mode == 1)
+                return;     // already stopped
+
+            Output_Debug_Message(0, "--- Stop Started");
             int i;
 
             gOp.mode = 1;   // measuring
-            timerPolling.Enabled = false;
             timer500.Enabled = false;
+
+            stopTimeout = 0;
+            timerStop.Enabled = true;
+            Btn_Stop.Enabled = false;
+            mFormMessage.Show();
 
             for (i = 0; i < MAX_NUM_SN; i++)
             { 
                 if (gOp.ValidDevice[i] == 1)
                 {
                     gOp.ValidDevice[i] = 0;
-                    gThread[i].Join();
+                    //gThread[i].Join();
                 }
             }
-            timerStop.Enabled = true;
-            Btn_Stop.Enabled = false;
-            mFormMessage.Show();
         }
 
         public async void DataReading(int index, FormZ1 myclass)
@@ -370,7 +367,7 @@ namespace VCZ1_TOOL
                 //Thread.Sleep(1000);
 
                 ERROR_CODE result = ERROR_CODE.NONE;
-                listDebug.Items.Insert(0, "=================== Start " + index.ToString() + "-th Device");
+                Output_Debug_Message(0, "=================== Start " + index.ToString() + "-th Device");
 
                 if (pMain.gOp.ValidDevice[index] == 0)
                     break;
@@ -385,6 +382,8 @@ namespace VCZ1_TOOL
                         iElapsedTime = (dtCurTime.Ticks - dtStartTime.Ticks) / 10000000;
                         if (iElapsedTime >= 120)
                             pMain.Set_Connection_Status(index, false);
+                        
+                        Check_EndTime_Of_Measure();
                         continue;
                     }
                     pMain.Set_Connection_Status(index, true);
@@ -403,14 +402,15 @@ namespace VCZ1_TOOL
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
                     if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
-                        listDebug.Items.Insert(0, "### " + gOp.SN[index] + "(온도):" + "Read Error");
+                        Output_Debug_Message(0, "### " + gOp.SN[index] + "(온도):" + "Read Error");
+                        Check_EndTime_Of_Measure();
                         continue;
                     }
 
                     srVals = srData.Split(' ');
                     values[0] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     values[0] = values[0] / 100.0;
-                    listDebug.Items.Insert(0, gOp.SN[index] + "(온도):" + srVals[1] + " "+ srVals[2] + "==>" + values[0].ToString());
+                    Output_Debug_Message(0, gOp.SN[index] + "(온도):" + srVals[1] + " "+ srVals[2] + "==>" + values[0].ToString());
 
                     if (pMain.gOp.ValidDevice[index] == 0)
                         break;
@@ -419,14 +419,15 @@ namespace VCZ1_TOOL
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
                     if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
-                        listDebug.Items.Insert(0, "### " + gOp.SN[index] + "(습도):" + "Read Error");
+                        Output_Debug_Message(0, "### " + gOp.SN[index] + "(습도):" + "Read Error");
+                        Check_EndTime_Of_Measure();
                         continue;
                     }
 
                     srVals = srData.Split(' ');
                     values[1] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     values[1] = values[1] / 100.0;
-                    listDebug.Items.Insert(0, gOp.SN[index] + "(습도):" + srVals[1] + " " + srVals[2] + "==>" + values[1].ToString());
+                    Output_Debug_Message(0, gOp.SN[index] + "(습도):" + srVals[1] + " " + srVals[2] + "==>" + values[1].ToString());
 
                     if (pMain.gOp.ValidDevice[index] == 0)
                         break;
@@ -435,13 +436,14 @@ namespace VCZ1_TOOL
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
                     if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
-                        listDebug.Items.Insert(0, "### " + gOp.SN[index] + "(TVOC):" + "Read Error");
+                        Output_Debug_Message(0, "### " + gOp.SN[index] + "(TVOC):" + "Read Error");
+                        Check_EndTime_Of_Measure();
                         continue;
                     }
 
                     srVals = srData.Split(' ');
                     values[2] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
-                    listDebug.Items.Insert(0, gOp.SN[index] + "(TVOC):" + srVals[1] + " " + srVals[2] + "==>" + values[2].ToString());
+                    Output_Debug_Message(0, gOp.SN[index] + "(TVOC):" + srVals[1] + " " + srVals[2] + "==>" + values[2].ToString());
 
                     if (pMain.gOp.ValidDevice[index] == 0)
                         break;
@@ -450,13 +452,14 @@ namespace VCZ1_TOOL
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
                     if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
-                        listDebug.Items.Insert(0, "### " + gOp.SN[index] + "(FAN속도):" + "Read Error");
+                        Output_Debug_Message(0, "### " + gOp.SN[index] + "(FAN속도):" + "Read Error");
+                        Check_EndTime_Of_Measure();
                         continue;
                     }
                     
                     srVals = srData.Split(' ');
                     values[3] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
-                    listDebug.Items.Insert(0, gOp.SN[index] + "(FANS):" + srVals[1] + " " + srVals[2] + "==>" + values[3].ToString());
+                    Output_Debug_Message(0, gOp.SN[index] + "(FANS):" + srVals[1] + " " + srVals[2] + "==>" + values[3].ToString());
 
                     if (pMain.gOp.ValidDevice[index] == 0)
                         break;
@@ -465,13 +468,14 @@ namespace VCZ1_TOOL
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
                     if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
-                        listDebug.Items.Insert(0, "### " + gOp.SN[index] + "(CO2):" + "Read Error");
+                        Output_Debug_Message(0, "### " + gOp.SN[index] + "(CO2):" + "Read Error");
+                        Check_EndTime_Of_Measure();
                         continue;
                     }
 
                     srVals = srData.Split(' ');
                     values[4] = int.Parse(srVals[4]) * 16777215 + int.Parse(srVals[3]) * 655536 + int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
-                    listDebug.Items.Insert(0, gOp.SN[index] + "(CO2):" + ble[index].getCharacteristic() + "==>" + values[4].ToString());
+                    Output_Debug_Message(0, gOp.SN[index] + "(CO2):" + ble[index].getCharacteristic() + "==>" + values[4].ToString());
 
                     if (pMain.gOp.ValidDevice[index] == 0)
                         break;
@@ -480,18 +484,20 @@ namespace VCZ1_TOOL
                     srData = await ble[index].ReadCharacteristic(dev_name, characteristic_name);
                     if (!srData.StartsWith("ERROR_CODE.NONE"))
                     {
-                        listDebug.Items.Insert(0, "### " + gOp.SN[index] + "(BATTERY):" + "Read Error");
+                        Output_Debug_Message(0, "### " + gOp.SN[index] + "(BATTERY):" + "Read Error");
+                        Check_EndTime_Of_Measure();
                         continue;
                     }
                     
                     srVals = srData.Split(' ');
                     values[5] = int.Parse(srVals[1]);
-                    listDebug.Items.Insert(0, gOp.SN[index] + "(BATT):" + ble[index].getCharacteristic() + "==>" + values[4].ToString());
+                    Output_Debug_Message(0, gOp.SN[index] + "(BATT):" + ble[index].getCharacteristic() + "==>" + values[4].ToString());
                 }
                 catch (Exception error)
                 {
                     Warning_Message("Read Exception Occurred!");
-                    listDebug.Items.Insert(0, gOp.SN[index] + "ERROR OCCURRED");
+                    Output_Debug_Message(0, gOp.SN[index] + "ERROR OCCURRED");
+                    Check_EndTime_Of_Measure();
                     continue;
                 }
 
@@ -499,23 +505,19 @@ namespace VCZ1_TOOL
                 Post_Processing_Result(index, values);
                 Set_Connection_Status(index, true);
             }
-            pMain.listDebug.Items.Insert(0, ">>>>>>>>>>>>>>>>>>>>>> Ended " + index.ToString() + "-th Device");
-            pMain.Write_AverageMinMax(index);
-            pMain.listDebug.Items.Insert(0, ">>>>>>>>>>>>>>>>>>>>>> Writed average " + index.ToString() + "-th Device");
+            Check_EndTime_Of_Measure();
+            Output_Debug_Message(0, ">>>>>>>>>>>>>>>>>>>>>> Ended " + index.ToString() + "-th Device");
             gOp.ThreadStatus[index] = 0;
+            pMain.Write_AverageMinMax(index);
+            Output_Debug_Message(0, ">>>>>>>>>>>>>>>>>>>>>> Writed average " + index.ToString() + "-th Device");
+            //gThread[index].Abort();
+            timerStop_Tick(this, null);
         }
 
         private void Post_Processing_Result(int index, double [] values)
         {
-            DateTimeOffset dateNow = DateTime.Now;
-            gOp.elpased = (dateNow.Ticks - gOp.curStartTime.Ticks) / 10000000;
-
-            if (gOp.elpased >= gCfg.duration * 60)
-            {
-                // All Done
-                Stop_Measure();
-                return;
-            }
+            Check_EndTime_Of_Measure();
+            
             gOp.numRead[index]++;
 
             //--- Averaging
@@ -604,6 +606,7 @@ namespace VCZ1_TOOL
             //--- Logging
             if (gCfg.log_method == 1)   // all
             {
+                DateTimeOffset dateNow = DateTime.Now;
                 string strDate = dateNow.ToString("yyyyMMdd_hhmmss");
                 string strfile = string.Format("{0}\\{1}_{2}.csv", gCfg.log_dir, gOp.SN[index], gOp.strLogDate);
                 string str = string.Format("{0}, {1}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}, {6:0.0}, {7:0.0}\r\n",
@@ -614,8 +617,22 @@ namespace VCZ1_TOOL
             //--- Display Elapsed Time, GetValues(0:temp, 1:humi, 2:tvoc, 3:fans, 4:co2, 5:battery)
             string strValue = string.Format("현재값({0},{1}) #read={2}: <{3},  {4},  {5},  {6},  {7}, {8}>", index, gOp.SN[index], gOp.numRead[index], values[0], values[1], values[2], values[3], values[4], values[5]);
             LMessage2.Text = strValue;
+
             return;
 
+        }
+
+        private void Check_EndTime_Of_Measure()
+        {
+            DateTimeOffset dateNow = DateTime.Now;
+            gOp.elpased = (dateNow.Ticks - gOp.curStartTime.Ticks) / 10000000;
+
+            if (gOp.elpased >= gCfg.duration * 60)
+            {
+                // All Done
+                Stop_Measure();
+                return;
+            }
         }
 
         private void Write_AverageMinMax(int index)
@@ -717,20 +734,6 @@ namespace VCZ1_TOOL
             System.IO.File.AppendAllText(strfile, str, Encoding.Default);
         }
 
-        private void Write_AverageMinMax()
-        {
-            string[] strResult = { "PASS", "FAIL" };
-
-            for (int i = 0; i < MAX_NUM_SN; i++)
-            {
-                if (gOp.SN[i].Length > 0)
-                {
-                    Write_AverageMinMax(i);
-                }
-            }
-
-        }
-
         /* Get Next Valid index */
         private int Get_Next_SN(int start_ix)
         {
@@ -765,26 +768,6 @@ namespace VCZ1_TOOL
                 dgvForm.Rows[index].Cells[2].Value = "NG";
                 dgvForm.Rows[index].Cells[2].Style.BackColor = PAIRFAIL;
             }
-        }
-
-        private void Display_Status()
-        {
-
-        }
-
-        private void Data_Received()
-        {
-
-        }
-
-        private void Log_Data()
-        {
-
-        }
-
-        private void SN_Read()
-        {
-
         }
 
         private void SetCurrentInputPostion()

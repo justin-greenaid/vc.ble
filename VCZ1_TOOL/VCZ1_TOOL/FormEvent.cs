@@ -66,7 +66,6 @@ namespace VCZ1_TOOL
         private void Btn_Pair_Click(object sender, EventArgs e)
         {
             //--- GetScanned Devices
-            // Z1_SCAN_ALL();
             Z1_LIST_DEVICES();
 
             //--- Get SN 
@@ -86,15 +85,8 @@ namespace VCZ1_TOOL
             SetCurrentInputPostion();
         }
 
-        private void Btn_Unpair_Click(object sender, EventArgs e)
-        {
-            // nothing to do
-            SetCurrentInputPostion();
-        }
-
         private void Btn_Stop_Click(object sender, EventArgs e)
         {
-            listDebug.Items.Insert(0, "--- Stop Started");
             Stop_Measure();
         }
 
@@ -188,20 +180,6 @@ namespace VCZ1_TOOL
             }
         }
 
-        private void Btn_ScanAll_Click(object sender, EventArgs e)
-        {
-            Z1_SCAN_ALL();
-        }
-
-        private void Btn_ListDevice_Click(object sender, EventArgs e)
-        {
-            Z1_LIST_DEVICES();
-        }
-
-        private void dgvForm_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
-        {
-        }
-
         private void dgvForm_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
             if (e.ColumnIndex != 1)
@@ -221,31 +199,84 @@ namespace VCZ1_TOOL
             if (e.RowIndex >= dgvForm.RowCount || e.ColumnIndex != 1)
                 return;
 
-            listDebug.Items.Clear();
-            listDebug.Items.Insert(0, "Cur #: " + gOp.numSN.ToString() + "(" + dgvForm.Rows[e.RowIndex].Cells[1].Value + ")");
-            for (int i = 0; i < gOp.numSN; i++)
+            try
             {
-                listDebug.Items.Insert(0, (i + 1).ToString() + ":" + dgvForm.Rows[i].Cells[1].Value);
-                if (e.RowIndex != i && dgvForm.Rows[e.RowIndex].Cells[1].Value != null && dgvForm.Rows[i].Cells[1].Value != null && dgvForm.Rows[i].Cells[1].Value != null) // compare
+                Output_Debug_Message(0, "Cur #: " + gOp.numSN.ToString() + "(" + dgvForm.Rows[e.RowIndex].Cells[1].Value + ")");
+                for (int i = 0; i < gOp.numSN; i++)
                 {
-                    if (dgvForm.Rows[e.RowIndex].Cells[1].Value.ToString() == dgvForm.Rows[i].Cells[1].Value.ToString())  // duplicated
+                    Output_Debug_Message(0, (i + 1).ToString() + ":" + dgvForm.Rows[i].Cells[1].Value);
+                    if (e.RowIndex != i && dgvForm.Rows[e.RowIndex].Cells[1].Value != null && dgvForm.Rows[i].Cells[1].Value != null && dgvForm.Rows[i].Cells[1].Value != null) // compare
                     {
-                        LMessage2.Text = "Duplicated" + e.RowIndex.ToString();
-                        dgvForm.Rows[e.RowIndex].Cells[1].Value = "";
-                        this.timer100.Enabled = true;
-                        return;
+                        if (dgvForm.Rows[e.RowIndex].Cells[1].Value.ToString() == dgvForm.Rows[i].Cells[1].Value.ToString())  // duplicated
+                        {
+                            LMessage2.Text = "Duplicated" + e.RowIndex.ToString();
+                            dgvForm.Rows[e.RowIndex].Cells[1].Value = "";
+                            this.timer100.Enabled = true;
+                            return;
+                        }
                     }
                 }
-            }
 
-            if (dgvForm.Rows[e.RowIndex].Cells[1].Value != null)
+                if (dgvForm.Rows[e.RowIndex].Cells[1].Value != null)
+                {
+                    gOp.SN[e.RowIndex] = dgvForm.Rows[e.RowIndex].Cells[1].Value.ToString();
+                    if (e.RowIndex >= gOp.numSN)
+                        gOp.numSN++;
+                }
+            } 
+            catch
             {
-                gOp.SN[e.RowIndex] = dgvForm.Rows[e.RowIndex].Cells[1].Value.ToString();
-                if (e.RowIndex >= gOp.numSN)
-                    gOp.numSN++;
+
+            }
+            this.timer100.Enabled = true;
+        }
+
+        private void dgvForm_ColumnHeaderMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            int iReadNO = 0;
+            string line;
+
+            //---- read SN from File
+
+
+            if (File.Exists(strCheckFolder + "\\snlist.txt") == false)
+            {
+                Warning_Message("No snllist.txt file");
+                return;
             }
 
-            this.timer100.Enabled = true;
+            // ClearList
+            ClearGridValuesExceptSN();
+
+            // ReadFrom snlist.txt
+            // Read the file and display it line by line.  
+            System.IO.StreamReader file = new System.IO.StreamReader(strCheckFolder + "\\snlist.txt");
+            while ((line = file.ReadLine()) != null)
+            {
+                dgvForm.Rows[iReadNO].Cells[1].Value = line;
+                gOp.SN[iReadNO] = line;
+                iReadNO++;
+
+                if (iReadNO >= MAX_NUM_SN)
+                    break;
+            }
+            file.Close();
+        }
+
+        private void Btn_Unpair_Click(object sender, EventArgs e)
+        {
+            // nothing to do
+            SetCurrentInputPostion();
+        }
+
+        private void Btn_ScanAll_Click(object sender, EventArgs e)
+        {
+            Z1_SCAN_ALL();
+        }
+
+        private void Btn_ListDevice_Click(object sender, EventArgs e)
+        {
+            Z1_LIST_DEVICES();
         }
 
         private void Btn_SNLoad_Click(object sender, EventArgs e)
@@ -280,37 +311,6 @@ namespace VCZ1_TOOL
             file.Close();
         }
 
-        private void dgvForm_ColumnHeaderMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            int iReadNO = 0;
-            string line;
-
-            //---- read SN from File
-
-
-            if (File.Exists(strCheckFolder + "\\snlist.txt") == false)
-            {
-                Warning_Message("No snllist.txt file");
-                return;
-            }
-
-            // ClearList
-            ClearGridValuesExceptSN();
-
-            // ReadFrom snlist.txt
-            // Read the file and display it line by line.  
-            System.IO.StreamReader file = new System.IO.StreamReader(strCheckFolder + "\\snlist.txt");
-            while ((line = file.ReadLine()) != null)
-            {
-                dgvForm.Rows[iReadNO].Cells[1].Value = line;
-                gOp.SN[iReadNO] = line;
-                iReadNO++;
-
-                if (iReadNO >= MAX_NUM_SN)
-                    break;
-            }
-            file.Close();
-        }
 
     }
 }

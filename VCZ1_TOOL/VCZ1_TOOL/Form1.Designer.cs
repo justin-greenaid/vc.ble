@@ -63,9 +63,7 @@
             this.Btn_Unpair = new System.Windows.Forms.Button();
             this.LMessage = new System.Windows.Forms.Label();
             this.LMessage2 = new System.Windows.Forms.Label();
-            this.listDebug = new System.Windows.Forms.ListBox();
             this.timer100 = new System.Windows.Forms.Timer(this.components);
-            this.timerPolling = new System.Windows.Forms.Timer(this.components);
             this.LWARNING = new System.Windows.Forms.Label();
             this.timer3000 = new System.Windows.Forms.Timer(this.components);
             this.timer400 = new System.Windows.Forms.Timer(this.components);
@@ -130,7 +128,6 @@
             this.dgvForm.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dgvForm_CellBeginEdit);
             this.dgvForm.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvForm_CellEndEdit);
             this.dgvForm.ColumnHeaderMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvForm_ColumnHeaderMouseDoubleClick);
-            this.dgvForm.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.dgvForm_PreviewKeyDown);
             // 
             // NO
             // 
@@ -283,7 +280,6 @@
             this.dgvStd.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dgvStd.Size = new System.Drawing.Size(381, 265);
             this.dgvStd.TabIndex = 3;
-            this.dgvStd.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvStd_CellContentClick);
             // 
             // TYPE
             // 
@@ -396,7 +392,6 @@
             this.RB_AVG.TabStop = true;
             this.RB_AVG.Text = "평균값 LOG 기록";
             this.RB_AVG.UseVisualStyleBackColor = true;
-            this.RB_AVG.CheckedChanged += new System.EventHandler(this.RB_AVG_CheckedChanged);
             this.RB_AVG.Click += new System.EventHandler(this.RB_AVG_Click);
             // 
             // Btn_Stop
@@ -479,25 +474,9 @@
             this.LMessage2.TabIndex = 13;
             this.LMessage2.Text = "-";
             // 
-            // listDebug
-            // 
-            this.listDebug.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.listDebug.FormattingEnabled = true;
-            this.listDebug.ItemHeight = 17;
-            this.listDebug.Location = new System.Drawing.Point(0, 727);
-            this.listDebug.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
-            this.listDebug.Name = "listDebug";
-            this.listDebug.Size = new System.Drawing.Size(642, 140);
-            this.listDebug.TabIndex = 14;
-            // 
             // timer100
             // 
             this.timer100.Tick += new System.EventHandler(this.timer100_Tick);
-            // 
-            // timerPolling
-            // 
-            this.timerPolling.Interval = 2000;
-            this.timerPolling.Tick += new System.EventHandler(this.timerPolling_Tick);
             // 
             // LWARNING
             // 
@@ -539,7 +518,7 @@
             // 
             // Btn_ListDevice
             // 
-            this.Btn_ListDevice.Location = new System.Drawing.Point(828, 732);
+            this.Btn_ListDevice.Location = new System.Drawing.Point(828, 778);
             this.Btn_ListDevice.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
             this.Btn_ListDevice.Name = "Btn_ListDevice";
             this.Btn_ListDevice.Size = new System.Drawing.Size(136, 35);
@@ -550,7 +529,7 @@
             // 
             // Btn_SNLoad
             // 
-            this.Btn_SNLoad.Location = new System.Drawing.Point(666, 777);
+            this.Btn_SNLoad.Location = new System.Drawing.Point(668, 830);
             this.Btn_SNLoad.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.Btn_SNLoad.Name = "Btn_SNLoad";
             this.Btn_SNLoad.Size = new System.Drawing.Size(296, 37);
@@ -574,6 +553,7 @@
             // 
             // timerStop
             // 
+            this.timerStop.Interval = 500;
             this.timerStop.Tick += new System.EventHandler(this.timerStop_Tick);
             // 
             // FormZ1
@@ -581,14 +561,13 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 28F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(1367, 696);
+            this.ClientSize = new System.Drawing.Size(1367, 698);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.Btn_SNLoad);
             this.Controls.Add(this.Btn_ListDevice);
             this.Controls.Add(this.Btn_ScanAll);
             this.Controls.Add(this.LWARNING);
             this.Controls.Add(this.Btn_Unpair);
-            this.Controls.Add(this.listDebug);
             this.Controls.Add(this.LMessage2);
             this.Controls.Add(this.LMessage);
             this.Controls.Add(this.panel1);
@@ -601,7 +580,7 @@
             this.MinimizeBox = false;
             this.Name = "FormZ1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "PSZ 검사 툴 (버전 1.0.0.4)";
+            this.Text = "PSZ 검사 툴 (버전 1.0.0.5)";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormZ1_FormClosed);
             this.Load += new System.EventHandler(this.FormZ1_Load);
             this.Shown += new System.EventHandler(this.FormZ1_Shown);
@@ -635,9 +614,7 @@
         private System.Windows.Forms.Label LMessage;
         private System.Windows.Forms.Button Btn_Standard;
         private System.Windows.Forms.Label LMessage2;
-        private System.Windows.Forms.ListBox listDebug;
         private System.Windows.Forms.Timer timer100;
-        private System.Windows.Forms.Timer timerPolling;
         private System.Windows.Forms.Label LWARNING;
         private System.Windows.Forms.Timer timer3000;
         private System.Windows.Forms.Timer timer400;

@@ -105,9 +105,10 @@ namespace VCZ1_TOOL
         string strCheckFolder = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\'));
         int numDoubleClick = 0;
         double[] z1_values = new double[6]; // 0:온도, 1:습도, 2:TVOC, 3:FANSPEED, 4:CO2, 5:BATTERY
-        int read_complete = 0;
+        int stopTimeout = 0;    // forced Stop after 10 seconds (value 100)
         Bleservice[] ble = new Bleservice[MAX_NUM_SN];
         bool display_current = false;    // display current value instead of average.
+        FormMessage mFormMessage = new FormMessage();
 
         Color UPCOLOR = Color.FromArgb(0, 128, 255);
         Color DOWNCOLOR = Color.FromArgb(0, 64, 128);
@@ -122,8 +123,6 @@ namespace VCZ1_TOOL
         Color ENABLEDCOLOR = Color.White;
         Color ONCOLOR = Color.LightGray;
         Color OFFCOLOR = Color.Gray;
-
-        FormMessage mFormMessage = new FormMessage();
 
         public FormZ1()
         {
@@ -155,6 +154,11 @@ namespace VCZ1_TOOL
             Write_Configuration();
         }
 
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            display_current = checkBox1.Checked;
+        }
+
         private void timer100_Tick(object sender, EventArgs e)
         {
             // Set selected row to numSN
@@ -165,136 +169,10 @@ namespace VCZ1_TOOL
             //    dgvForm.Rows[gOp.numSN].Cells[1].Selected = true;
         }
 
-        private void timer3000_Tick(object sender, EventArgs e)
-        {
-            timer3000.Enabled = false;
-            LWARNING.Text = "-";
-        }
-
-        private async void timerPolling_Tick(object sender, EventArgs e)
-        {
-            timerPolling.Enabled = false;
-            int iresult = 0;
-            DateTimeOffset dateNow = DateTime.Now;
-            gOp.elpased = (dateNow.Ticks - gOp.curStartTime.Ticks) / 10000000;
-
-            //--- Getting Data
-            read_complete = 0;
-            Task<int> ret = Z1_GET_DATA(gOp.curIndex, z1_values);
-            try
-            {
-                iresult = await ret;
-            }
-            catch (Exception ex)
-            {
-                listDebug.Items.Insert(0, "################## GET DATA ERROR");
-            }
-            if (iresult > 0)
-            {
-                gOp.numRead[gOp.curIndex]++;
-            } 
-            else
-            {
-                //--- Check Duration and Save Result
-                if (gOp.elpased >= gCfg.duration * 60)
-                {
-                    Write_AverageMinMax();
-                    // All Done
-                    Stop_Measure();
-                    return;
-                }
-
-                // skip
-                //gOp.curIndex = Get_Next_SN(gOp.curIndex + 1);
-                if (gOp.mode == 2)
-                    timerPolling.Enabled = true;
-                return;
-            }
-
-            //--- Averaging
-            for (int k = 0; k < 6; k++)
-            {
-                gMeasure[gOp.curIndex,k].sum += z1_values[k];
-                gMeasure[gOp.curIndex, k].avg = gMeasure[gOp.curIndex, k].sum / gOp.numRead[gOp.curIndex];
-                if (z1_values[k] < gMeasure[gOp.curIndex, k].min) 
-                    gMeasure[gOp.curIndex, k].min = z1_values[k];
-                if (z1_values[k] > gMeasure[gOp.curIndex, k].max) 
-                    gMeasure[gOp.curIndex, k].max = z1_values[k];
-            }
-
-            //--- display value and error with color
-            dgvForm.Rows[gOp.curIndex].Cells[3].Value = ((int)(gMeasure[gOp.curIndex, 0].avg * 10)) / 10.0;
-            dgvForm.Rows[gOp.curIndex].Cells[4].Value = ((int)(gMeasure[gOp.curIndex, 1].avg * 10)) / 10.0;
-            dgvForm.Rows[gOp.curIndex].Cells[5].Value = ((int)(gMeasure[gOp.curIndex, 2].avg * 10)) / 10.0;
-            dgvForm.Rows[gOp.curIndex].Cells[6].Value = ((int)(gMeasure[gOp.curIndex, 3].avg * 10)) / 10.0;
-            dgvForm.Rows[gOp.curIndex].Cells[7].Value = ((int)(gMeasure[gOp.curIndex, 4].avg * 10)) / 10.0;
-            dgvForm.Rows[gOp.curIndex].Cells[8].Value = ((int)(gMeasure[gOp.curIndex, 5].avg * 10)) / 10.0;
-
-            if (gMeasure[gOp.curIndex, 0].avg > gCfg.temp[1] || gMeasure[gOp.curIndex, 0].avg < gCfg.temp[2])
-                dgvForm.Rows[gOp.curIndex].Cells[3].Style.BackColor = WARNCOLOR;
-            else
-                dgvForm.Rows[gOp.curIndex].Cells[3].Style.BackColor = NORMALCOLOR;
-
-            if (gMeasure[gOp.curIndex, 1].avg > gCfg.humi[1] || gMeasure[gOp.curIndex, 1].avg < gCfg.humi[2])
-                dgvForm.Rows[gOp.curIndex].Cells[4].Style.BackColor = WARNCOLOR;
-            else
-                dgvForm.Rows[gOp.curIndex].Cells[4].Style.BackColor = NORMALCOLOR;
-
-            if (gMeasure[gOp.curIndex, 2].avg > gCfg.tvoc[1] || gMeasure[gOp.curIndex, 2].avg < gCfg.tvoc[2])
-                dgvForm.Rows[gOp.curIndex].Cells[5].Style.BackColor = WARNCOLOR;
-            else
-                dgvForm.Rows[gOp.curIndex].Cells[5].Style.BackColor = NORMALCOLOR;
-
-            if (gMeasure[gOp.curIndex, 3].avg > gCfg.fans[1] || gMeasure[gOp.curIndex, 3].avg < gCfg.fans[2])
-                dgvForm.Rows[gOp.curIndex].Cells[6].Style.BackColor = WARNCOLOR;
-            else
-                dgvForm.Rows[gOp.curIndex].Cells[6].Style.BackColor = NORMALCOLOR;
-
-            if (gMeasure[gOp.curIndex, 4].avg > gCfg.co2[1] || gMeasure[gOp.curIndex, 4].avg < gCfg.co2[2])
-                dgvForm.Rows[gOp.curIndex].Cells[7].Style.BackColor = WARNCOLOR;
-            else
-                dgvForm.Rows[gOp.curIndex].Cells[7].Style.BackColor = NORMALCOLOR;
-
-            dgvForm.Rows[gOp.curIndex].Cells[8].Style.BackColor = NORMALCOLOR;
-
-            //--- Logging
-            if (gCfg.log_method == 1)   // all
-            {
-                string strDate = dateNow.ToString("yyyyMMdd_hhmmss");
-                string strfile = string.Format("{0}\\{1}_{2}.csv", gCfg.log_dir, gOp.SN[gOp.curIndex], gOp.strLogDate);
-                string str = string.Format("{0}, {1}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}, {6:0.0}\r\n", 
-                                    strDate, gOp.SN[gOp.curIndex], z1_values[0], z1_values[1], z1_values[2], z1_values[3], z1_values[4]);
-                System.IO.File.AppendAllText(strfile, str, Encoding.Default);
-            }
-
-            //--- Check Duration and Save Result
-            if (gOp.elpased >= gCfg.duration*60)
-            {
-                Write_AverageMinMax();
-                // All Done
-                Stop_Measure();
-                return;
-            }
-
-            //--- Display Elapsed Time, GetValues(0:temp, 1:humi, 2:tvoc, 3:fans, 4:co2, 5:battery)
-            string strValue = string.Format("현재값({0},{1}): {2},  {3},  {4},  {5},  {6}", gOp.curIndex, gOp.SN[gOp.curIndex],z1_values[0], z1_values[1], z1_values[2], z1_values[3], z1_values[4], z1_values[5]);
-            LMessage2.Text = strValue;
-            if (gOp.mode == 2)
-                timerPolling.Enabled = true;
-
-            gOp.curIndex = Get_Next_SN(gOp.curIndex + 1);
-
-        }
-
         private void timer400_Tick(object sender, EventArgs e)
         {
             numDoubleClick = 0;
             timer400.Enabled = false;
-        }
-
-        private void RB_AVG_CheckedChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void timer500_Tick(object sender, EventArgs e)
@@ -318,20 +196,17 @@ namespace VCZ1_TOOL
             }
         }
 
-        private void dgvStd_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void timer3000_Tick(object sender, EventArgs e)
         {
-
-        }
-
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-            display_current = checkBox1.Checked;
+            timer3000.Enabled = false;
+            LWARNING.Text = "-";
         }
 
         private void timerStop_Tick(object sender, EventArgs e)
         {
             int i;
             bool bStatusRunning = false;
+            stopTimeout++;
 
             for (i = 0; i < MAX_NUM_SN; i++)
             {
@@ -341,13 +216,19 @@ namespace VCZ1_TOOL
                     break;
                 }
             }
+            string str = string.Format("{0},{1},{2},{3},{4},   {5},{6},{7},{8},{9}   ({10})",
+                gOp.ThreadStatus[0], gOp.ThreadStatus[1], gOp.ThreadStatus[2],
+                gOp.ThreadStatus[3], gOp.ThreadStatus[4], gOp.ThreadStatus[5],
+                gOp.ThreadStatus[6], gOp.ThreadStatus[7], gOp.ThreadStatus[8],
+                gOp.ThreadStatus[9], stopTimeout);
 
-            if (bStatusRunning == false)
+            mFormMessage.Set_Message(str);
+
+            if (bStatusRunning == false)// || stopTimeout > 100)
             {
                 mFormMessage.Hide();
                 timerStop.Enabled = false;
                 Button_Enable(gOp.mode);
-                //--- enable timer for stopping
                 SetCurrentInputPostion();
             }
         }
