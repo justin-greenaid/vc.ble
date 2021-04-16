@@ -79,7 +79,7 @@ namespace VCZ1_TOOL
                 gCfg.log_dir = inif.Read("Configuration", "log_dir");
                 gCfg.prefix = inif.Read("Configuration", "name_prefix");
                 if (gCfg.prefix == "")
-                    gCfg.prefix = "VC PSZ";
+                    gCfg.prefix = "VC Z-mini";
             }
             else
             {
@@ -107,7 +107,7 @@ namespace VCZ1_TOOL
                 gCfg.numMaxDevice = 50;
 
                 gCfg.log_dir = "c:\\temp";
-                gCfg.prefix = "VC PSZ";
+                gCfg.prefix = "VC Z-mini";
             }
         }
 
@@ -361,6 +361,7 @@ namespace VCZ1_TOOL
             DateTimeOffset dtStartTime = DateTime.Now;
             DateTimeOffset dtCurTime = DateTime.Now;
             gOp.ThreadStatus[index] = 1;
+            int iTemp = 0;
 
             while (pMain.gOp.ValidDevice[index] == 1)
             {
@@ -409,8 +410,9 @@ namespace VCZ1_TOOL
 
                     srVals = srData.Split(' ');
                     values[0] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
-                    values[0] = values[0] / 100.0;
-                    Output_Debug_Message(0, gOp.SN[index] + "(온도):" + srVals[1] + " "+ srVals[2] + "==>" + values[0].ToString());
+                    values[0] = (int) (values[0] / 100.0);
+                    iTemp = (int) values[0];
+                    Output_Debug_Message(0, gOp.SN[index] + "(온도):" + srVals[1] + " "+ srVals[2] + "==>" + iTemp.ToString());
 
                     if (pMain.gOp.ValidDevice[index] == 0)
                         break;
@@ -426,8 +428,9 @@ namespace VCZ1_TOOL
 
                     srVals = srData.Split(' ');
                     values[1] = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
-                    values[1] = values[1] / 100.0;
-                    Output_Debug_Message(0, gOp.SN[index] + "(습도):" + srVals[1] + " " + srVals[2] + "==>" + values[1].ToString());
+                    values[1] = (int) (values[1] / 100.0);
+                    iTemp = (int)values[1];
+                    Output_Debug_Message(0, gOp.SN[index] + "(습도):" + srVals[1] + " " + srVals[2] + "==>" + iTemp.ToString());
 
                     if (pMain.gOp.ValidDevice[index] == 0)
                         break;
@@ -534,8 +537,8 @@ namespace VCZ1_TOOL
             //--- display value and error with color
             if (display_current)
             {
-                dgvForm.Rows[index].Cells[3].Value = ((int)(values[0] * 10)) / 10.0;
-                dgvForm.Rows[index].Cells[4].Value = ((int)(values[1] * 10)) / 10.0;
+                dgvForm.Rows[index].Cells[3].Value = (int)(values[0]);
+                dgvForm.Rows[index].Cells[4].Value = (int)(values[1]);
                 dgvForm.Rows[index].Cells[5].Value = ((int)(values[2] * 10)) / 10.0;
                 dgvForm.Rows[index].Cells[6].Value = ((int)(values[3] * 10)) / 10.0;
                 dgvForm.Rows[index].Cells[7].Value = ((int)(values[4] * 10)) / 10.0;
@@ -568,8 +571,8 @@ namespace VCZ1_TOOL
             }
             else
             {
-                dgvForm.Rows[index].Cells[3].Value = ((int)(gMeasure[index, 0].avg * 10)) / 10.0;
-                dgvForm.Rows[index].Cells[4].Value = ((int)(gMeasure[index, 1].avg * 10)) / 10.0;
+                dgvForm.Rows[index].Cells[3].Value = (int)(gMeasure[index, 0].avg);
+                dgvForm.Rows[index].Cells[4].Value = (int)(gMeasure[index, 1].avg);
                 dgvForm.Rows[index].Cells[5].Value = ((int)(gMeasure[index, 2].avg * 10)) / 10.0;
                 dgvForm.Rows[index].Cells[6].Value = ((int)(gMeasure[index, 3].avg * 10)) / 10.0;
                 dgvForm.Rows[index].Cells[7].Value = ((int)(gMeasure[index, 4].avg * 10)) / 10.0;
@@ -641,17 +644,17 @@ namespace VCZ1_TOOL
 
             string strfile = string.Format("{0}\\{1}_{2}.csv", gCfg.log_dir, gOp.SN[index], gOp.strLogDate);
             string str = string.Format("AVERAGE, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}, {6:0.0}\r\n",
-                        gOp.SN[index], gMeasure[index, 0].avg, gMeasure[index, 1].avg,
+                        gOp.SN[index], (int) (gMeasure[index, 0].avg), (int) (gMeasure[index, 1].avg),
                         gMeasure[index, 2].avg, gMeasure[index, 3].avg, gMeasure[index, 4].avg, gMeasure[index, 5].avg);
             System.IO.File.AppendAllText(strfile, str, Encoding.Default);
 
             str = string.Format("MAX, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}, {6:0.0}\r\n",
-                        gOp.SN[index], gMeasure[index, 0].max, gMeasure[index, 1].max,
+                        gOp.SN[index], (int) gMeasure[index, 0].max, (int) gMeasure[index, 1].max,
                         gMeasure[index, 2].max, gMeasure[index, 3].max, gMeasure[index, 4].max, gMeasure[index, 5].max);
             System.IO.File.AppendAllText(strfile, str, Encoding.Default);
 
             str = string.Format("MIN, {0}, {1:0.0}, {2:0.0}, {3:0.0}, {4:0.0}, {5:0.0}, {6:0.0}\r\n",
-                        gOp.SN[index], gMeasure[index, 0].min, gMeasure[index, 1].min,
+                        gOp.SN[index], (int) gMeasure[index, 0].min, (int) gMeasure[index, 1].min,
                         gMeasure[index, 2].min, gMeasure[index, 3].min, gMeasure[index, 4].min, gMeasure[index, 5].min);
             System.IO.File.AppendAllText(strfile, str, Encoding.Default);
 
