@@ -9,6 +9,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Ble.Service;
+using Windows.Devices.Radios;
+using System.ServiceProcess;
 
 namespace ble.multi
 {
@@ -164,7 +166,7 @@ namespace ble.multi
                     };
                     break;
                 case DeviceList.BLE2:
-                    result = ble2.StartScan(devName, (d)=> { });
+                    result = ble2.StartScan(devName, (d) => { });
                     showmessage2(result.ToString());
                     if (result.Equals(ERROR_CODE.BLE_FOUND_DEVICE))
                     {
@@ -217,7 +219,7 @@ namespace ble.multi
                     srVals = dataString.Split(' ');
                     resultSum = int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
                     break;
-                    
+
                 case "BatteryLevel":
                     resultSum = int.Parse(dataString);
                     break;
@@ -225,7 +227,7 @@ namespace ble.multi
                 case "Co2":
                     srVals = dataString.Split(' ');
                     resultSum = int.Parse(srVals[4]) * 16777215 + int.Parse(srVals[3]) * 655536 + int.Parse(srVals[2]) * 256 + int.Parse(srVals[1]);
-                    
+
                     break;
             }
             return resultSum.ToString();
@@ -233,7 +235,7 @@ namespace ble.multi
         private async Task<string> BleGetCharacteristic(DeviceList idx, string devName, string characterName)
         {
             string resultString = "";
-            
+
             try
             {
                 var parts = characterName.Split('/');
@@ -305,19 +307,19 @@ namespace ble.multi
             {
                 case DeviceList.BLE1:
                     device_name = GetDeviceNameFromList(idx);
-                    result = ble1.ConnnectionStatus(device_name); 
+                    result = ble1.ConnnectionStatus(device_name);
                     break;
                 case DeviceList.BLE2:
                     device_name = GetDeviceNameFromList(idx);
-                    result = ble2.ConnnectionStatus(device_name); 
+                    result = ble2.ConnnectionStatus(device_name);
                     break;
                 case DeviceList.BLE3:
                     device_name = GetDeviceNameFromList(idx);
-                    result = ble3.ConnnectionStatus(device_name); 
+                    result = ble3.ConnnectionStatus(device_name);
                     break;
                 case DeviceList.BLE4:
                     device_name = GetDeviceNameFromList(idx);
-                    result = ble4.ConnnectionStatus(device_name); 
+                    result = ble4.ConnnectionStatus(device_name);
                     break;
                 default:
                     device_name = "UnknownDevice";
@@ -365,7 +367,7 @@ namespace ble.multi
             }
             return result;
         }
-        public async  void ThreadRunxx(DeviceList idx)
+        public async void ThreadRunxx(DeviceList idx)
         {
 
             var device_name = "";
@@ -375,7 +377,7 @@ namespace ble.multi
             string resultString = " ";
 
             while (GetThreadStatus(idx)) {
-                
+
                 if (GetDeviceConnectionStatus(idx) == ERROR_CODE.BLE_NO_CONNECTED)
                 {
                     device_name = GetDeviceNameFromList(idx);
@@ -387,7 +389,7 @@ namespace ble.multi
                     }
                 }
                 resultString = await BleGetCharacteristic(idx, device_name, char_temp);
-                if (!resultString.StartsWith("ERROR_CODE.NONE")) 
+                if (!resultString.StartsWith("ERROR_CODE.NONE"))
                 {
                     continue;
                 }
@@ -458,7 +460,7 @@ namespace ble.multi
             listDevice.Items.Clear();
             listDevice.Items.Add("Waitting...");
             ble0.StartScan();
-            await Task.Delay(Int32.Parse(textScanTime.Text)*1000);
+            await Task.Delay(Int32.Parse(textScanTime.Text) * 1000);
             var result = ble0.GetDeviceList();
             listDevice.Items.Clear();
             for (int i = 0; i < result.Count(); i++)
@@ -516,12 +518,12 @@ namespace ble.multi
             SetThreadStatus(DeviceList.BLE2, false);
             SetThreadStatus(DeviceList.BLE3, false);
             SetThreadStatus(DeviceList.BLE4, false);
-            if (thread1 != null) 
+            if (thread1 != null)
             {
                 thread1.Abort();
                 thread1.Join();
                 thread1 = null;
-            } 
+            }
             if (thread2 != null)
             {
                 thread2.Abort();
@@ -542,6 +544,131 @@ namespace ble.multi
             }
             Task.Delay(1000);
 
+        }
+
+        private async void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            var result222 = await Radio.RequestAccessAsync();
+            IReadOnlyList<Radio> radios = await Radio.GetRadiosAsync();
+            Radio BluetoothRadio = radios.FirstOrDefault(radio => radio.Kind == RadioKind.Bluetooth);
+            RadioAccessStatus result;
+            foreach (Radio module in radios)
+            {
+                if (module.Kind == RadioKind.Bluetooth)
+                {
+                    if (module.State == RadioState.Off)
+                        result = await module.SetStateAsync(RadioState.On);
+
+                    else
+                        result = await module.SetStateAsync(RadioState.Off);
+
+                }
+            }
+        }
+        public void StartService(string serviceName, int timeoutMilliseconds)
+        {
+            ServiceController service = new ServiceController(serviceName);
+            try
+            {
+                listDevice.Items.Add($"Status: {service.Status}...");
+                TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
+                service.Start();
+                service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+                listDevice.Items.Add($"Status: {service.Status}...");
+            }
+            catch
+            {
+                // ...
+            }
+        }
+        public void StopService(string serviceName, int timeoutMilliseconds)
+        {
+            ServiceController service = new ServiceController(serviceName);
+            try
+            {
+                listDevice.Items.Add($"Status: {service.Status}...");
+                listDevice.Items.Add($"Can Pause and Continue = {service.CanPauseAndContinue}");
+                listDevice.Items.Add($"Can ShutDown = {service.CanShutdown}");
+                listDevice.Items.Add($"Can Stop = {service.CanStop}");
+
+                TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
+
+                service.Stop();
+                service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+                listDevice.Items.Add($"Status: {service.Status}...");
+            }
+            catch
+            {
+                // ...
+            }
+        }
+        public void RestartService(string serviceName, int timeoutMilliseconds)
+        {
+            ServiceController service = new ServiceController(serviceName);
+            try
+            {
+                int millisec1 = Environment.TickCount;
+                TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
+
+                listDevice.Items.Add($"Status: {service.Status}...");
+                service.Stop();
+                service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+                listDevice.Items.Add($"Status: {service.Status}...");
+                // count the rest of the timeout
+                int millisec2 = Environment.TickCount;
+                timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds - (millisec2 - millisec1));
+
+                service.Start();
+                service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+                listDevice.Items.Add($"Status: {service.Status}...");
+            }
+            catch
+            {
+                // ...
+            }
+        }
+        private void show_service(object sender, EventArgs e)
+        {
+            // get list of Windows services
+            ServiceController[] services = ServiceController.GetServices();
+
+            // try to find service name
+            foreach (ServiceController service in services)
+            {
+                listDevice.Items.Add($"{service.ServiceName}.{service.DisplayName}");
+
+            }
+            return;
+        }
+        private async void button1_Click(object sender, EventArgs e)
+        {
+            listDevice.Items.Add($"Starting Service...");
+            //show_service(sender, e );
+            StartService("bthserv", 20000);
+            listDevice.Items.Add($"Done...");
+        }
+
+        private void buttonServcieStop_Click(object sender, EventArgs e)
+        {
+            listDevice.Items.Add($"Stoping Service...");
+            //show_service(sender, e );
+            StopService("bthserv", 20000);
+            listDevice.Items.Add($"Done...");
+        }
+
+        private void buttonServcieRestart_Click(object sender, EventArgs e)
+        {
+            listDevice.Items.Add($"Restarting Service...");
+            //show_service(sender, e );
+            RestartService("bthserv", 20000);
+            listDevice.Items.Add($"Done...");
+        }
+
+        private void buttonServiceList_Click(object sender, EventArgs e)
+        {
+            listDevice.Items.Add($"List Service...");
+            show_service(sender, e );
+            listDevice.Items.Add($"Done...");
         }
     }
 }
